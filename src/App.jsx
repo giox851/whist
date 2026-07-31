@@ -1,53 +1,30 @@
-function App() {
-2
-return (
-3
-<div
-4
-style={{
-5
-display: "flex",
-6
-flexDirection: "column",
-7
-alignItems: "center",
-8
-marginTop: "50px",
-9
-fontFamily: "Arial"
-10
-}}
-11
->
-12
-<h1>WHIST ONLINE</h1>
-13
- 
-14
-<button
-15
-style={{
-16
-padding: "10px 20px",
-17
-fontSize: "18px",
-18
-cursor: "pointer"
-19
-}}
-20
->
-21
-CREA TAVOLO
-22
-</button>
-23
-</div>
-24
-);
-25
+import * as React from "react";
+export default function App() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h1>WHIST ONLINE</h1> 
+      <button
+        style={{
+          padding: "12px 24px",
+          fontSize: "18px",
+          borderRadius: "8px",
+          border: "none",
+          cursor: "pointer",
+          backgroundColor: "#1976d2",
+          color: "#fff",
+        }}
+      >
+        CREA TAVOLO
+      </button>
+    </div>
+  );
 }
-26
- 
-27
-export default App;
