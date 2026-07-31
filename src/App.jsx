@@ -1,5 +1,12 @@
-import { useState } from "react";
-import { collection, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "./services/firebase";
 export default function App() {
   const [tableCode, setTableCode] = useState("");
@@ -7,6 +14,18 @@ export default function App() {
   const [joinCode, setJoinCode] = useState("");
   const [inLobby, setInLobby] = useState(false);
   const [message, setMessage] = useState("");
+  const [players, setPlayers] = useState({});
+  useEffect(() => {
+    if (!tableCode) return;
+    const tableRef = doc(db, "tables", tableCode);
+    const unsubscribe = onSnapshot(tableRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setPlayers(data.players || {});
+      }
+    });
+    return () => unsubscribe();
+  }, [tableCode]);
   async function createTable() {
     if (!playerName.trim()) {
       alert("Inserisci il nome del giocatore");
@@ -40,30 +59,31 @@ export default function App() {
       alert("Inserisci il codice tavolo");
       return;
     }
-    const tableRef = doc(db, "tables", joinCode.toUpperCase());
+    const code = joinCode.toUpperCase();
+    const tableRef = doc(db, "tables", code);
     const tableSnap = await getDoc(tableRef);
     if (!tableSnap.exists()) {
       alert("Tavolo non trovato");
       return;
     }
     const data = tableSnap.data();
-    const players = data.players || {};
+    const playersData = data.players || {};
     let seat = null;
-    if (!players.seat1) seat = "seat1";
-    else if (!players.seat2) seat = "seat2";
-    else if (!players.seat3) seat = "seat3";
-    else if (!players.seat4) seat = "seat4";
+    if (!playersData.seat1) seat = "seat1";
+    else if (!playersData.seat2) seat = "seat2";
+    else if (!playersData.seat3) seat = "seat3";
+    else if (!playersData.seat4) seat = "seat4";
     if (!seat) {
       alert("Tavolo pieno");
       return;
     }
-    players[seat] = {
+    playersData[seat] = {
       name: playerName,
     };
     await updateDoc(tableRef, {
-      players,
+      players: playersData,
     });
-    setTableCode(joinCode.toUpperCase());
+    setTableCode(code);
     setMessage(`Entrato come ${seat}`);
     setInLobby(true);
   }
@@ -73,10 +93,10 @@ export default function App() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
         minHeight: "100vh",
-        gap: "20px",
         padding: "20px",
+        gap: "15px",
+        fontFamily: "Arial",
       }}
     >
       {!inLobby && (
@@ -89,7 +109,7 @@ export default function App() {
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
             style={{
-              padding: "10px",
+              padding: "12px",
               width: "280px",
               fontSize: "16px",
             }}
@@ -98,19 +118,15 @@ export default function App() {
           <button
             onClick={createTable}
             style={{
-              padding: "12px 20px",
               width: "280px",
+              padding: "12px",
               fontSize: "16px",
             }}
           >
             CREA TAVOLO
           </button>
            
-          <hr
-            style={{
-              width: "280px",
-            }}
-          />
+          <hr style={{ width: "280px" }} />
            
           <input
             type="text"
@@ -118,7 +134,7 @@ export default function App() {
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value)}
             style={{
-              padding: "10px",
+              padding: "12px",
               width: "280px",
               fontSize: "16px",
             }}
@@ -127,8 +143,8 @@ export default function App() {
           <button
             onClick={joinTable}
             style={{
-              padding: "12px 20px",
               width: "280px",
+              padding: "12px",
               fontSize: "16px",
             }}
           >
@@ -148,13 +164,12 @@ export default function App() {
               width: "280px",
             }}
           >
-            <p>1. Occupato o libero</p>
-            <p>2. Occupato o libero</p>
-            <p>3. Occupato o libero</p>
-            <p>4. Occupato o libero</p>
+            <p>1. {players.seat1?.name || "Libero"}</p> 
+            <p>2. {players.seat2?.name || "Libero"}</p> 
+            <p>3. {players.seat3?.name || "Libero"}</p> 
+            <p>4. {players.seat4?.name || "Libero"}</p>
           </div>
-           <h2>{tableCode}</h2> 
-          <p>Comunica questo codice agli altri giocatori</p>
+           <h2>{tableCode}</h2>
         </>
       )}
     </div>
