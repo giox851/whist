@@ -2,15 +2,19 @@ import { useState } from "react";
 import { collection, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../services/firebase";
+import { getPlayerId } from "../services/player";
 export default function Home() {
   const navigate = useNavigate();
-  const [playerName, setPlayerName] = useState("");
+  const [playerName, setPlayerName] = useState(
+    localStorage.getItem("playerName") || "",
+  );
   const [joinCode, setJoinCode] = useState("");
   async function createTable() {
     if (!playerName.trim()) {
       alert("Inserisci il nome del giocatore");
       return;
     }
+    const playerId = getPlayerId();
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
     for (let i = 0; i < 5; i++) {
@@ -22,11 +26,14 @@ export default function Home() {
       createdAt: new Date().toISOString(),
       players: {
         seat1: {
+          id: playerId,
           name: playerName,
         },
       },
     });
     localStorage.setItem("playerName", playerName);
+    localStorage.setItem("seat", "seat1");
+    localStorage.setItem("tableCode", code);
     navigate(`/table/${code}`);
   }
   async function joinTable() {
@@ -38,6 +45,7 @@ export default function Home() {
       alert("Inserisci il codice tavolo");
       return;
     }
+    const playerId = getPlayerId();
     const code = joinCode.toUpperCase();
     const tableRef = doc(db, "tables", code);
     const tableSnap = await getDoc(tableRef);
@@ -57,6 +65,7 @@ export default function Home() {
       return;
     }
     players[seat] = {
+      id: playerId,
       name: playerName,
     };
     await updateDoc(tableRef, {
@@ -64,6 +73,7 @@ export default function Home() {
     });
     localStorage.setItem("playerName", playerName);
     localStorage.setItem("seat", seat);
+    localStorage.setItem("tableCode", code);
     navigate(`/table/${code}`);
   }
   return (

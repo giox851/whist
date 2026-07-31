@@ -1,9 +1,11 @@
+JSX;
 export default function Lobby({
   tableCode,
   players,
   playerCount,
   message,
   copyInviteLink,
+  leaveTable,
 }) {
   return (
     <div
@@ -27,9 +29,9 @@ export default function Lobby({
           width: "280px",
         }}
       >
-        <p>1. {players.seat1?.name || "Libero"}</p>
-        <p>2. {players.seat2?.name || "Libero"}</p>
-        <p>3. {players.seat3?.name || "Libero"}</p>
+        <p>1. {players.seat1?.name || "Libero"}</p> 
+        <p>2. {players.seat2?.name || "Libero"}</p> 
+        <p>3. {players.seat3?.name || "Libero"}</p> 
         <p>4. {players.seat4?.name || "Libero"}</p>
       </div>
        
@@ -45,11 +47,27 @@ export default function Lobby({
       </button>
        
       <button
+        onClick={leaveTable}
+        style={{
+          width: "280px",
+          padding: "12px",
+          fontSize: "16px",
+          backgroundColor: "#d32f2f",
+          color: "white",
+          border: "none",
+          borderRadius: "4px",
+        }}
+      >
+        ESCI DAL TAVOLO
+      </button>
+       
+      <button
         disabled={playerCount < 4}
         style={{
           width: "280px",
           padding: "12px",
           fontSize: "16px",
+          opacity: playerCount < 4 ? 0.5 : 1,
         }}
       >
         INIZIA PARTITA

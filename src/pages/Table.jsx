@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
-import { useParams } from "react-router-dom";
+import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
+import { useNavigate, useParams } from "react-router-dom";
 import Lobby from "../components/Lobby";
 import { db } from "../services/firebase";
 export default function Table() {
   const { tableCode } = useParams();
+  const navigate = useNavigate();
   const [players, setPlayers] = useState({});
   const [message, setMessage] = useState("");
   useEffect(() => {
@@ -20,19 +21,40 @@ export default function Table() {
   useEffect(() => {
     const seat = localStorage.getItem("seat");
     if (seat) {
-      setMessage(`Entrato come ${seat}`);
-    } else {
-      setMessage("Creatore del tavolo");
+      setMessage(`Connesso come ${seat}`);
     }
   }, []);
   async function copyInviteLink() {
-    const inviteLink = window.location.href;
     try {
-      await navigator.clipboard.writeText(inviteLink);
+      await navigator.clipboard.writeText(window.location.href);
       alert("Link copiato");
-    } catch (error) {
-      alert("Errore nella copia del link");
+    } catch {
+      alert("Errore nella copia");
     }
+  }
+  async function leaveTable() {
+    const seat = localStorage.getItem("seat");
+    if (!seat) {
+      navigate("/");
+      return;
+    }
+    const tableRef = doc(db, "tables", tableCode.toUpperCase());
+    const snapshot = await getDoc(tableRef);
+    if (!snapshot.exists()) {
+      navigate("/");
+      return;
+    }
+    const data = snapshot.data();
+    const updatedPlayers = {
+      ...(data.players || {}),
+    };
+    delete updatedPlayers[seat];
+    await updateDoc(tableRef, {
+      players: updatedPlayers,
+    });
+    localStorage.removeItem("seat");
+    localStorage.removeItem("tableCode");
+    navigate("/");
   }
   const playerCount = Object.keys(players).length;
   return (
@@ -42,6 +64,7 @@ export default function Table() {
       playerCount={playerCount}
       message={message}
       copyInviteLink={copyInviteLink}
+      leaveTable={leaveTable}
     />
   );
 }
