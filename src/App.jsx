@@ -87,6 +87,17 @@ export default function App() {
     setMessage(`Entrato come ${seat}`);
     setInLobby(true);
   }
+  async function copyInviteLink() {
+    const inviteLink = `${window.location.origin}/table/${tableCode}`;
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      alert("Link copiato negli appunti");
+    } catch (error) {
+      console.error(error);
+      alert("Errore durante la copia del link");
+    }
+  }
+  const playerCount = Object.keys(players).length;
   return (
     <div
       style={{
@@ -156,6 +167,7 @@ export default function App() {
       {inLobby && (
         <>
           <h1>TAVOLO {tableCode}</h1> <p>{message}</p> 
+          <p>Giocatori presenti: {playerCount}/4</p> 
           <div
             style={{
               border: "1px solid #ccc",
@@ -169,7 +181,28 @@ export default function App() {
             <p>3. {players.seat3?.name || "Libero"}</p> 
             <p>4. {players.seat4?.name || "Libero"}</p>
           </div>
-           <h2>{tableCode}</h2>
+           <h2>{tableCode}</h2> 
+          <button
+            onClick={copyInviteLink}
+            style={{
+              width: "280px",
+              padding: "12px",
+              fontSize: "16px",
+            }}
+          >
+            COPIA LINK INVITO
+          </button>
+           
+          <button
+            disabled={playerCount < 4}
+            style={{
+              width: "280px",
+              padding: "12px",
+              fontSize: "16px",
+            }}
+          >
+            INIZIA PARTITA
+          </button>
         </>
       )}
     </div>
