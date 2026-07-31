@@ -4,6 +4,7 @@ import { db } from "./services/firebase";
 export default function App() {
   const [tableCode, setTableCode] = useState("");
   const [playerName, setPlayerName] = useState("");
+  const [inLobby, setInLobby] = useState(false);
   async function createTable() {
     if (!playerName.trim()) {
       alert("Inserisci il nome del giocatore");
@@ -25,51 +26,68 @@ export default function App() {
       },
     });
     setTableCode(code);
+    setInLobby(true);
   }
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        gap: "20px",
-        padding: "20px",
-      }}
-    >
-      <h1>WHIST ONLINE</h1>
-       
-      <input
-        type="text"
-        placeholder="Nome giocatore"
-        value={playerName}
-        onChange={(e) => setPlayerName(e.target.value)}
-        style={{
-          padding: "10px",
-          width: "250px",
-          fontSize: "16px",
-        }}
-      />
-       
-      <button
-        onClick={createTable}
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-        }}
-      >
-        CREA TAVOLO
-      </button>
-       
-      {tableCode && (
-        <div style={{ textAlign: "center" }}>
-          <h2>Codice Tavolo</h2>
-          <h1>{tableCode}</h1>
-          <p>Giocatore 1: {playerName}</p>
+return (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: "100vh",
+      gap: "20px",
+      padding: "20px",
+    }}
+  >
+    {!inLobby && (
+      <>
+        <h1>WHIST ONLINE</h1>
+         
+        <input
+          type="text"
+          placeholder="Nome giocatore"
+          value={playerName}
+          onChange={(e) => setPlayerName(e.target.value)}
+          style={{
+            padding: "10px",
+            width: "250px",
+            fontSize: "16px",
+          }}
+        />
+         
+        <button
+          onClick={createTable}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            cursor: "pointer",
+          }}
+        >
+          CREA TAVOLO
+        </button>
+      </>
+    )}
+     
+    {inLobby && (
+      <>
+        <h1>TAVOLO {tableCode}</h1> 
+        <div
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+            padding: "20px",
+            minWidth: "280px",
+          }}
+        >
+          <p>1. {playerName}</p>
+          <p>2. Libero</p>
+          <p>3. Libero</p>
+          <p>4. Libero</p>
         </div>
-      )}
-    </div>
-  );
+         <p>Comunica il codice agli altri giocatori:</p> <h2>{tableCode}</h2>
+      </>
+    )}
+  </div>
+);
 }
