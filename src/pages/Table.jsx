@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,6 +12,7 @@ export default function Table() {
   const [registered, setRegistered] = useState(false);
   const [playerName, setPlayerName] = useState("");
   const [gamesToPlay, setGamesToPlay] = useState(8);
+  const [isCreator, setIsCreator] = useState(false);
   useEffect(() => {
     const playerId = getPlayerId();
     const tableRef = doc(db, "tables", tableCode.toUpperCase());
@@ -21,6 +21,10 @@ export default function Table() {
         return;
       }
       const data = snapshot.data();
+      if (data.status === "playing") {
+        navigate(`/game/${tableCode.toUpperCase()}`);
+        return;
+      }
       const currentPlayers = data.players || {};
       setPlayers(currentPlayers);
       setGamesToPlay(data.gamesToPlay || 8);
@@ -28,9 +32,14 @@ export default function Table() {
         (player) => player.id === playerId,
       );
       setRegistered(alreadyPresent);
+      if (currentPlayers.seat1 && currentPlayers.seat1.id === playerId) {
+        setIsCreator(true);
+      } else {
+        setIsCreator(false);
+      }
     });
     return () => unsubscribe();
-  }, [tableCode]);
+  }, [tableCode, navigate]);
   useEffect(() => {
     const seat = localStorage.getItem("seat");
     if (seat) {
@@ -79,6 +88,20 @@ export default function Table() {
     localStorage.setItem("tableCode", tableCode.toUpperCase());
     setMessage(`Connesso come ${seat}`);
     setRegistered(true);
+  }
+  async function startGame() {
+    const suits = ["♠", "♥", "♦", "♣"];
+    const trumpSuit = suits[Math.floor(Math.random() * suits.length)];
+    const tableRef = doc(db, "tables", tableCode.toUpperCase());
+    await updateDoc(tableRef, {
+      status: "playing",
+      phase: "bidding",
+      currentGame: 1,
+      trumpSuit: trumpSuit,
+      firstBidder: "seat1",
+      currentBidder: "seat1",
+      bids: {},
+    });
   }
   async function copyInviteLink() {
     try {
@@ -164,6 +187,8 @@ export default function Table() {
       copyInviteLink={copyInviteLink}
       leaveTable={leaveTable}
       gamesToPlay={gamesToPlay}
+      startGame={startGame}
+      isCreator={isCreator}
     />
   );
 }
