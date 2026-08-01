@@ -1,4 +1,3 @@
-JSX;
 export default function Lobby({
   tableCode,
   players,
@@ -56,6 +55,7 @@ export default function Lobby({
           color: "white",
           border: "none",
           borderRadius: "4px",
+          cursor: "pointer",
         }}
       >
         ESCI DAL TAVOLO
@@ -68,6 +68,7 @@ export default function Lobby({
           padding: "12px",
           fontSize: "16px",
           opacity: playerCount < 4 ? 0.5 : 1,
+          cursor: playerCount < 4 ? "not-allowed" : "pointer",
         }}
       >
         INIZIA PARTITA
