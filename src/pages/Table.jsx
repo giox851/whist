@@ -1,9 +1,11 @@
+JSX;
 import { useEffect, useState } from "react";
 import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
 import Lobby from "../components/Lobby";
 import { db } from "../services/firebase";
 import { getPlayerId } from "../services/player";
+import { createDeck, shuffleDeck, dealCards } from "../services/cards";
 export default function Table() {
   const { tableCode } = useParams();
   const navigate = useNavigate();
@@ -92,15 +94,19 @@ export default function Table() {
   async function startGame() {
     const suits = ["♠", "♥", "♦", "♣"];
     const trumpSuit = suits[Math.floor(Math.random() * suits.length)];
+    const deck = createDeck();
+    const shuffledDeck = shuffleDeck(deck);
+    const hands = dealCards(shuffledDeck);
     const tableRef = doc(db, "tables", tableCode.toUpperCase());
     await updateDoc(tableRef, {
       status: "playing",
       phase: "bidding",
       currentGame: 1,
-      trumpSuit: trumpSuit,
+      trumpSuit,
       firstBidder: "seat1",
       currentBidder: "seat1",
       bids: {},
+      hands,
     });
   }
   async function copyInviteLink() {

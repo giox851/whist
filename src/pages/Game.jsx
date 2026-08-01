@@ -30,7 +30,7 @@ export default function Game() {
     });
     return () => unsubscribe();
   }, [tableCode]);
-  if (!gameData) {
+  if (!gameData || !mySeat) {
     return (
       <div
         style={{
@@ -41,9 +41,11 @@ export default function Game() {
       </div>
     );
   }
-  const phase = gameData.phase || "bidding";
   const players = gameData.players || {};
+  const hands = gameData.hands || {};
+  const myCards = hands[mySeat] || [];
   const bids = gameData.bids || {};
+  const phase = gameData.phase || "bidding";
   return (
     <div
       style={{
@@ -61,31 +63,75 @@ export default function Game() {
         {" / "}
         {gameData.gamesToPlay || 8}
       </h1>
-       <h2>Tavolo {tableCode.toUpperCase()}</h2> 
+       
       <div
         style={{
           border: "1px solid #ccc",
-          borderRadius: "8px",
+          borderRadius: "10px",
           padding: "15px",
-          width: "320px",
+          width: "340px",
           textAlign: "center",
         }}
       >
-        <p>
-          <b>Fase:</b> {phase}
-        </p>
-         
         <p>
           <b>Briscola:</b> {gameData.trumpSuit}
         </p>
          
         <p>
-          <b>Primo dichiarante:</b> {gameData.firstBidder}
+          <b>Fase:</b> {phase}
         </p>
          
         <p>
-          <b>Turno:</b> {gameData.currentBidder}
+          <b>Il tuo posto:</b> {mySeat}
         </p>
+      </div>
+       
+      <div
+        style={{
+          border: "1px solid #ccc",
+          borderRadius: "10px",
+          padding: "15px",
+          width: "340px",
+        }}
+      >
+        <h3>Giocatori</h3> <div>Seat1: {players.seat1?.name}</div> 
+        <div>Seat2: {players.seat2?.name}</div> 
+        <div>Seat3: {players.seat3?.name}</div> 
+        <div>Seat4: {players.seat4?.name}</div>
+      </div>
+       
+      <div
+        style={{
+          border: "1px solid #ccc",
+          borderRadius: "10px",
+          padding: "15px",
+          width: "340px",
+        }}
+      >
+        <h3>Le tue 13 carte</h3> 
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "8px",
+          }}
+        >
+          {myCards.map((card, index) => (
+            <div
+              key={index}
+              style={{
+                border: "1px solid #999",
+                borderRadius: "6px",
+                padding: "8px 12px",
+                minWidth: "45px",
+                textAlign: "center",
+                backgroundColor: "white",
+              }}
+            >
+              {card.code}
+            </div>
+          ))}
+        </div>
       </div>
        
       {phase === "bidding" && (
@@ -101,32 +147,18 @@ export default function Game() {
       {phase === "playing" && (
         <div
           style={{
-            border: "1px solid #ccc",
-            borderRadius: "8px",
+            border: "2px solid green",
+            borderRadius: "10px",
             padding: "20px",
-            width: "320px",
+            width: "340px",
             textAlign: "center",
           }}
         >
-          FASE DI GIOCO
+          FASE DI GIOCO  
           <br />
-          (da implementare)
+          <br />  (da implementare)
         </div>
       )}
-       
-      <div
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          padding: "15px",
-          width: "320px",
-        }}
-      >
-        <h3>Giocatori</h3> <div>seat1: {players.seat1?.name || "-"}</div> 
-        <div>seat2: {players.seat2?.name || "-"}</div> 
-        <div>seat3: {players.seat3?.name || "-"}</div> 
-        <div>seat4: {players.seat4?.name || "-"}</div>
-      </div>
     </div>
   );
 }
