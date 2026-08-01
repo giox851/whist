@@ -15,17 +15,28 @@ export default function Table() {
     const playerId = getPlayerId();
     const tableRef = doc(db, "tables", tableCode.toUpperCase());
     const unsubscribe = onSnapshot(tableRef, (snapshot) => {
-      if (!snapshot.exists()) return;
+      if (!snapshot.exists()) {
+        return;
+      }
       const data = snapshot.data();
       const currentPlayers = data.players || {};
       setPlayers(currentPlayers);
       const alreadyPresent = Object.values(currentPlayers).some(
         (player) => player.id === playerId,
       );
+      console.log("PLAYER ID BROWSER:", playerId);
+      console.log("PLAYERS FIRESTORE:", currentPlayers);
+      console.log("ALREADY PRESENT:", alreadyPresent);
       setRegistered(alreadyPresent);
     });
     return () => unsubscribe();
   }, [tableCode]);
+  useEffect(() => {
+    const seat = localStorage.getItem("seat");
+    if (seat) {
+      setMessage(`Connesso come ${seat}`);
+    }
+  }, []);
   async function enterTable() {
     const name = playerName.trim();
     if (name.length < 3) {
