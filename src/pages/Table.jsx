@@ -1,4 +1,4 @@
-JSX;
+
 import { useEffect, useState } from "react";
 import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
