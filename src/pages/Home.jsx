@@ -10,8 +10,13 @@ export default function Home() {
   );
   const [joinCode, setJoinCode] = useState("");
   async function createTable() {
-    if (!playerName.trim()) {
-      alert("Inserisci il nome del giocatore");
+    const name = playerName.trim();
+    if (name.length < 3) {
+      alert("Il nome deve contenere almeno 3 caratteri");
+      return;
+    }
+    if (name.length > 15) {
+      alert("Il nome non può superare 15 caratteri");
       return;
     }
     const playerId = getPlayerId();
@@ -27,18 +32,23 @@ export default function Home() {
       players: {
         seat1: {
           id: playerId,
-          name: playerName,
+          name: name,
         },
       },
     });
-    localStorage.setItem("playerName", playerName);
+    localStorage.setItem("playerName", name);
     localStorage.setItem("seat", "seat1");
     localStorage.setItem("tableCode", code);
     navigate(`/table/${code}`);
   }
   async function joinTable() {
-    if (!playerName.trim()) {
-      alert("Inserisci il nome del giocatore");
+    const name = playerName.trim();
+    if (name.length < 3) {
+      alert("Il nome deve contenere almeno 3 caratteri");
+      return;
+    }
+    if (name.length > 15) {
+      alert("Il nome non può superare 15 caratteri");
       return;
     }
     if (!joinCode.trim()) {
@@ -55,6 +65,13 @@ export default function Home() {
     }
     const data = tableSnap.data();
     const players = data.players || {};
+    const nomeEsistente = Object.values(players).some(
+      (player) => player.name.toLowerCase().trim() === name.toLowerCase(),
+    );
+    if (nomeEsistente) {
+      alert("Nome già presente nel tavolo");
+      return;
+    }
     let seat = null;
     if (!players.seat1) seat = "seat1";
     else if (!players.seat2) seat = "seat2";
@@ -66,12 +83,12 @@ export default function Home() {
     }
     players[seat] = {
       id: playerId,
-      name: playerName,
+      name: name,
     };
     await updateDoc(tableRef, {
       players,
     });
-    localStorage.setItem("playerName", playerName);
+    localStorage.setItem("playerName", name);
     localStorage.setItem("seat", seat);
     localStorage.setItem("tableCode", code);
     navigate(`/table/${code}`);
