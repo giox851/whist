@@ -134,7 +134,7 @@ export default function Home() {
             gap: "10px",
           }}
         >
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((number) => (
+          {[4, 8].map((number) => (
             <button
               key={number}
               onClick={() => setGamesToPlay(number)}
