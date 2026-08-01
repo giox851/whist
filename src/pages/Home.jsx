@@ -9,6 +9,7 @@ export default function Home() {
     localStorage.getItem("playerName") || "",
   );
   const [joinCode, setJoinCode] = useState("");
+  const [gamesToPlay, setGamesToPlay] = useState(8);
   async function createTable() {
     const name = playerName.trim();
     if (name.length < 3) {
@@ -28,6 +29,7 @@ export default function Home() {
     await setDoc(doc(collection(db, "tables"), code), {
       tableId: code,
       status: "waiting",
+      gamesToPlay: gamesToPlay,
       createdAt: new Date().toISOString(),
       players: {
         seat1: {
@@ -45,10 +47,6 @@ export default function Home() {
     const name = playerName.trim();
     if (name.length < 3) {
       alert("Il nome deve contenere almeno 3 caratteri");
-      return;
-    }
-    if (name.length > 15) {
-      alert("Il nome non può superare 15 caratteri");
       return;
     }
     if (!joinCode.trim()) {
@@ -119,6 +117,47 @@ export default function Home() {
           fontSize: "16px",
         }}
       />
+       
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <b>Numero Partite</b> 
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 60px)",
+            gap: "10px",
+          }}
+        >
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((number) => (
+            <button
+              key={number}
+              onClick={() => setGamesToPlay(number)}
+              style={{
+                height: "50px",
+                fontSize: "18px",
+                fontWeight: "bold",
+                backgroundColor: gamesToPlay === number ? "#1976d2" : "#f0f0f0",
+                color: gamesToPlay === number ? "white" : "black",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                cursor: "pointer",
+              }}
+            >
+              {number}
+            </button>
+          ))}
+        </div>
+         
+        <div>
+          Partite selezionate: <b>{gamesToPlay}</b>
+        </div>
+      </div>
        
       <button
         onClick={createTable}

@@ -1,3 +1,4 @@
+JSX;
 import { useEffect, useState } from "react";
 import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,6 +12,7 @@ export default function Table() {
   const [message, setMessage] = useState("");
   const [registered, setRegistered] = useState(false);
   const [playerName, setPlayerName] = useState("");
+  const [gamesToPlay, setGamesToPlay] = useState(8);
   useEffect(() => {
     const playerId = getPlayerId();
     const tableRef = doc(db, "tables", tableCode.toUpperCase());
@@ -21,12 +23,10 @@ export default function Table() {
       const data = snapshot.data();
       const currentPlayers = data.players || {};
       setPlayers(currentPlayers);
+      setGamesToPlay(data.gamesToPlay || 8);
       const alreadyPresent = Object.values(currentPlayers).some(
         (player) => player.id === playerId,
       );
-      console.log("PLAYER ID BROWSER:", playerId);
-      console.log("PLAYERS FIRESTORE:", currentPlayers);
-      console.log("ALREADY PRESENT:", alreadyPresent);
       setRegistered(alreadyPresent);
     });
     return () => unsubscribe();
@@ -83,9 +83,9 @@ export default function Table() {
   async function copyInviteLink() {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      alert("Link copiato");
+      alert("Link copiato negli appunti");
     } catch {
-      alert("Errore nella copia");
+      alert("Errore durante la copia");
     }
   }
   async function leaveTable() {
@@ -124,9 +124,11 @@ export default function Table() {
           minHeight: "100vh",
           gap: "15px",
           padding: "20px",
+          fontFamily: "Arial",
         }}
       >
-        <h1>TAVOLO {tableCode.toUpperCase()}</h1>
+        <h1>TAVOLO {tableCode.toUpperCase()}</h1> 
+        <p>Partite previste: {gamesToPlay}</p>
          
         <input
           type="text"
@@ -161,6 +163,7 @@ export default function Table() {
       message={message}
       copyInviteLink={copyInviteLink}
       leaveTable={leaveTable}
+      gamesToPlay={gamesToPlay}
     />
   );
 }
