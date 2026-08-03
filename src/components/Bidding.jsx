@@ -37,7 +37,7 @@ export default function Bidding({
     const tableRef = doc(db, "tables", tableCode);
     const newBids = {
       ...bids,
-      value,
+      [mySeat]: value,
     };
     const totalBids = validSeats.filter(
       (seat) => newBids[seat] !== undefined,
