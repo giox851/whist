@@ -35,9 +35,12 @@ export default function Bidding({
     const tableRef = doc(db, "tables", tableCode);
     const newBids = {
       ...bids,
-      value,
+      [mySeat]: value
     };
-    const totalBids = Object.keys(newBids).length;
+    const totalBids = 
+    ["seat1", "seat2", "seat3", "seat4"].filter(
+    (seat) => newBids[seat] !== undefined,
+    ).length;
     if (totalBids === 4) {
       await updateDoc(tableRef, {
         bids: newBids,
