@@ -8,18 +8,20 @@ export default function Bidding({
   firstBidder,
   players,
 }) {
-  const bidOrder = ["seat1", "seat2", "seat3", "seat4"];
-  const firstIndex = bidOrder.indexOf(firstBidder);
+  const validSeats = ["seat1", "seat2", "seat3", "seat4"];
+  const firstIndex = validSeats.indexOf(firstBidder);
   const orderedSeats = [];
   for (let i = 0; i < 4; i++) {
-    orderedSeats.push(bidOrder[(firstIndex + i) % 4]);
+    orderedSeats.push(validSeats[(firstIndex + i) % 4]);
   }
   const isMyTurn = currentBidder === mySeat;
-  const bidsCount = Object.keys(bids).length;
+  const bidsCount = validSeats.filter(
+    (seat) => bids[seat] !== undefined,
+  ).length;
   let forbiddenValue = null;
   if (bidsCount === 3) {
-    const totalDeclared = Object.values(bids).reduce(
-      (sum, value) => sum + value,
+    const totalDeclared = validSeats.reduce(
+      (sum, seat) => sum + (bids[seat] || 0),
       0,
     );
     forbiddenValue = 13 - totalDeclared;
@@ -35,16 +37,16 @@ export default function Bidding({
     const tableRef = doc(db, "tables", tableCode);
     const newBids = {
       ...bids,
-      [mySeat]: value
+      value,
     };
-    const totalBids = 
-    ["seat1", "seat2", "seat3", "seat4"].filter(
-    (seat) => newBids[seat] !== undefined,
+    const totalBids = validSeats.filter(
+      (seat) => newBids[seat] !== undefined,
     ).length;
     if (totalBids === 4) {
       await updateDoc(tableRef, {
         bids: newBids,
         phase: "playing",
+        currentBidder: null,
       });
       return;
     }
@@ -75,7 +77,7 @@ export default function Bidding({
         <h3>Dichiarazioni</h3> 
         {orderedSeats.map((seat) => (
           <div key={seat}>
-            <b>{players[seat]?.name}</b>
+            <b>{players[seat]?.name || seat}</b>
             {" : "}
             {bids[seat] !== undefined ? bids[seat] : "-"}
           </div>
@@ -113,6 +115,12 @@ export default function Bidding({
               </button>
             ))}
           </div>
+           
+          {forbiddenValue !== null && (
+            <div>
+              Valore non disponibile: <b>{forbiddenValue}</b>
+            </div>
+          )}
         </>
       )}
     </div>

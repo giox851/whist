@@ -13,9 +13,7 @@ export default function Game() {
     const playerId = getPlayerId();
     const tableRef = doc(db, "tables", tableCode.toUpperCase());
     const unsubscribe = onSnapshot(tableRef, (snapshot) => {
-      if (!snapshot.exists()) {
-        return;
-      }
+      if (!snapshot.exists()) return;
       const data = snapshot.data();
       setGameData(data);
       const players = data.players || {};
@@ -32,21 +30,13 @@ export default function Game() {
     return () => unsubscribe();
   }, [tableCode]);
   if (!gameData || !mySeat) {
-    return (
-      <div
-        style={{
-          padding: "20px",
-        }}
-      >
-        Caricamento...
-      </div>
-    );
+    return <div style={{ padding: "20px" }}>Caricamento...</div>;
   }
   const players = gameData.players || {};
   const hands = gameData.hands || {};
-  const myCards = hands[mySeat] || [];
   const bids = gameData.bids || {};
   const phase = gameData.phase || "bidding";
+  const myCards = hands[mySeat] || [];
   const suitOrder = {
     "♠": 0,
     "♥": 1,
@@ -135,10 +125,20 @@ export default function Game() {
           width: "340px",
         }}
       >
-        <h3>Giocatori</h3> <div>Seat1: {players.seat1?.name}</div> 
-        <div>Seat2: {players.seat2?.name}</div> 
-        <div>Seat3: {players.seat3?.name}</div> 
-        <div>Seat4: {players.seat4?.name}</div>
+        <h3>Giocatori</h3> 
+        {["seat1", "seat2", "seat3", "seat4"].map((seat) => (
+          <div
+            key={seat}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: "8px",
+            }}
+          >
+            <span>{players[seat]?.name}</span> 
+            <span>🎯 {bids[seat] ?? "-"}</span>
+          </div>
+        ))}
       </div>
        
       <div
@@ -178,17 +178,17 @@ export default function Game() {
       {phase === "playing" && (
         <div
           style={{
+            width: "340px",
             border: "2px solid green",
             borderRadius: "10px",
             padding: "20px",
-            width: "340px",
             textAlign: "center",
           }}
         >
-          FASE DI GIOCO
-          <br />
-          <br />
-          (da implementare)
+          <h3>FASE DI GIOCO</h3> <p>Dichiarazioni completate</p> 
+          <p>
+            In attesa della prossima implementazione della giocata delle carte.
+          </p>
         </div>
       )}
     </div>
