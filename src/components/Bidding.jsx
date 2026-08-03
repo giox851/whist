@@ -37,15 +37,15 @@ export default function Bidding({
       ...bids,
       value,
     };
-    const currentIndex = orderedSeats.indexOf(mySeat);
-    const isLastPlayer = currentIndex === 3;
-    if (isLastPlayer) {
+    const totalBids = Object.keys(newBids).length;
+    if (totalBids === 4) {
       await updateDoc(tableRef, {
         bids: newBids,
         phase: "playing",
       });
       return;
     }
+    const currentIndex = orderedSeats.indexOf(mySeat);
     await updateDoc(tableRef, {
       bids: newBids,
       currentBidder: orderedSeats[currentIndex + 1],
@@ -72,7 +72,8 @@ export default function Bidding({
         <h3>Dichiarazioni</h3> 
         {orderedSeats.map((seat) => (
           <div key={seat}>
-            <b>{players[seat]?.name}</b> {" : "} 
+            <b>{players[seat]?.name}</b>
+            {" : "}
             {bids[seat] !== undefined ? bids[seat] : "-"}
           </div>
         ))}
@@ -102,6 +103,7 @@ export default function Bidding({
                   height: "50px",
                   fontSize: "18px",
                   fontWeight: "bold",
+                  cursor: "pointer",
                 }}
               >
                 {value}
