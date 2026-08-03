@@ -6,6 +6,7 @@ export default function Bidding({
   currentBidder,
   bids,
   firstBidder,
+  players,
 }) {
   const bidOrder = ["seat1", "seat2", "seat3", "seat4"];
   const firstIndex = bidOrder.indexOf(firstBidder);
@@ -13,7 +14,7 @@ export default function Bidding({
   for (let i = 0; i < 4; i++) {
     orderedSeats.push(bidOrder[(firstIndex + i) % 4]);
   }
-  const isMyTurn = mySeat === currentBidder;
+  const isMyTurn = currentBidder === mySeat;
   const bidsCount = Object.keys(bids).length;
   let forbiddenValue = null;
   if (bidsCount === 3) {
@@ -22,6 +23,12 @@ export default function Bidding({
       0,
     );
     forbiddenValue = 13 - totalDeclared;
+  }
+  let availableValues = Array.from({ length: 14 }, (_, i) => i);
+  if (forbiddenValue !== null) {
+    availableValues = availableValues.filter(
+      (value) => value !== forbiddenValue,
+    );
   }
   async function declareBid(value) {
     if (!isMyTurn) return;
@@ -57,22 +64,23 @@ export default function Bidding({
       <div
         style={{
           border: "1px solid #ccc",
-          borderRadius: "8px",
+          borderRadius: "10px",
           padding: "15px",
-          width: "320px",
+          width: "340px",
         }}
       >
         <h3>Dichiarazioni</h3> 
         {orderedSeats.map((seat) => (
           <div key={seat}>
-            {seat}: {bids[seat] !== undefined ? bids[seat] : "-"}
+            <b>{players[seat]?.name}</b> {" : "} 
+            {bids[seat] !== undefined ? bids[seat] : "-"}
           </div>
         ))}
       </div>
        
       {!isMyTurn && (
         <div>
-          In attesa della dichiarazione di <b>{currentBidder}</b>
+          In attesa della dichiarazione di <b>{players[currentBidder]?.name}</b>
         </div>
       )}
        
@@ -86,29 +94,20 @@ export default function Bidding({
               gap: "10px",
             }}
           >
-            {Array.from({ length: 14 }, (_, index) => index).map((value) => (
+            {availableValues.map((value) => (
               <button
                 key={value}
                 onClick={() => declareBid(value)}
-                disabled={value === forbiddenValue}
                 style={{
                   height: "50px",
                   fontSize: "18px",
                   fontWeight: "bold",
-                  opacity: value === forbiddenValue ? 0.3 : 1,
-                  cursor: value === forbiddenValue ? "not-allowed" : "pointer",
                 }}
               >
                 {value}
               </button>
             ))}
           </div>
-           
-          {forbiddenValue !== null && (
-            <div>
-              Non puoi dichiarare <b>{forbiddenValue}</b>
-            </div>
-          )}
         </>
       )}
     </div>

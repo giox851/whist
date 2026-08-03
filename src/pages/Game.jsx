@@ -108,7 +108,7 @@ export default function Game() {
           width: "340px",
         }}
       >
-        <h3>Le tue 13 carte</h3> 
+        <h3>Le tue carte</h3> 
         <div
           style={{
             display: "flex",
@@ -141,6 +141,7 @@ export default function Game() {
           currentBidder={gameData.currentBidder}
           bids={bids}
           firstBidder={gameData.firstBidder}
+          players={players}
         />
       )}
        
@@ -154,9 +155,10 @@ export default function Game() {
             textAlign: "center",
           }}
         >
-          FASE DI GIOCO  
+          FASE DI GIOCO
           <br />
-          <br />  (da implementare)
+          <br />
+          (da implementare)
         </div>
       )}
     </div>
