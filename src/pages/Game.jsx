@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { db } from "../services/firebase";
 import { getPlayerId } from "../services/player";
 import Bidding from "../components/Bidding";
+import Card from "../components/Card";
 export default function Game() {
   const { tableCode } = useParams();
   const [gameData, setGameData] = useState(null);
@@ -46,6 +47,33 @@ export default function Game() {
   const myCards = hands[mySeat] || [];
   const bids = gameData.bids || {};
   const phase = gameData.phase || "bidding";
+  const suitOrder = {
+    "♠": 0,
+    "♥": 1,
+    "♦": 2,
+    "♣": 3,
+  };
+  const rankOrder = {
+    A: 13,
+    K: 12,
+    Q: 11,
+    J: 10,
+    10: 9,
+    9: 8,
+    8: 7,
+    7: 6,
+    6: 5,
+    5: 4,
+    4: 3,
+    3: 2,
+    2: 1,
+  };
+  const sortedCards = [...myCards].sort((a, b) => {
+    if (a.suit !== b.suit) {
+      return suitOrder[a.suit] - suitOrder[b.suit];
+    }
+    return rankOrder[b.rank] - rankOrder[a.rank];
+  });
   return (
     <div
       style={{
@@ -66,24 +94,37 @@ export default function Game() {
        
       <div
         style={{
-          border: "1px solid #ccc",
-          borderRadius: "10px",
+          border: "3px solid orange",
+          borderRadius: "12px",
           padding: "15px",
           width: "340px",
           textAlign: "center",
         }}
       >
-        <p>
-          <b>Briscola:</b> {gameData.trumpSuit}
-        </p>
+        <div
+          style={{
+            fontSize: "42px",
+          }}
+        >
+          {gameData.trumpSuit}
+        </div>
          
-        <p>
+        <div
+          style={{
+            fontWeight: "bold",
+          }}
+        >
+          BRISCOLA
+        </div>
+         
+        <br /> 
+        <div>
           <b>Fase:</b> {phase}
-        </p>
+        </div>
          
-        <p>
+        <div>
           <b>Il tuo posto:</b> {mySeat}
-        </p>
+        </div>
       </div>
        
       <div
@@ -114,22 +155,11 @@ export default function Game() {
             display: "flex",
             flexWrap: "wrap",
             gap: "8px",
+            justifyContent: "center",
           }}
         >
-          {myCards.map((card, index) => (
-            <div
-              key={index}
-              style={{
-                border: "1px solid #999",
-                borderRadius: "6px",
-                padding: "8px 12px",
-                minWidth: "45px",
-                textAlign: "center",
-                backgroundColor: "white",
-              }}
-            >
-              {card.code}
-            </div>
+          {sortedCards.map((card, index) => (
+            <Card key={index} card={card} />
           ))}
         </div>
       </div>
