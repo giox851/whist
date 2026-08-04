@@ -73,11 +73,11 @@ export default function Game() {
     const updatedHand = myCards.filter((c) => c.code !== card.code);
     const updatedHands = {
       ...hands,
-      updatedHand,
+      [mySeat]: updatedHand,
     };
     const updatedTrick = {
       ...currentTrick,
-      card,
+      [mySeat]:card,
     };
     const order = ["seat1", "seat2", "seat3", "seat4"];
     const currentIndex = order.indexOf(mySeat);
