@@ -79,7 +79,7 @@ export default function Table() {
     }
     currentPlayers[seat] = {
       id: getPlayerId(),
-      name: name,
+      name,
     };
     await updateDoc(tableRef, {
       players: currentPlayers,
@@ -106,6 +106,15 @@ export default function Table() {
       currentBidder: "seat1",
       bids: {},
       hands,
+      currentPlayer: "seat1",
+      leadSeat: "seat1",
+      currentTrick: {},
+      tricksWon: {
+        seat1: 0,
+        seat2: 0,
+        seat3: 0,
+        seat4: 0,
+      },
     });
   }
   async function copyInviteLink() {

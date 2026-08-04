@@ -1,7 +1,8 @@
-export default function Card({ card }) {
+export default function Card({ card, onClick, disabled = false }) {
   const isRed = card.suit === "♥" || card.suit === "♦";
   return (
     <div
+      onClick={disabled ? undefined : onClick}
       style={{
         width: "60px",
         height: "90px",
@@ -15,6 +16,8 @@ export default function Card({ card }) {
         fontWeight: "bold",
         color: isRed ? "#d32f2f" : "#000",
         boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.8 : 1,
       }}
     >
       <div

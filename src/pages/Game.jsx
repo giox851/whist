@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import { db } from "../services/firebase";
 import { getPlayerId } from "../services/player";
@@ -36,6 +36,8 @@ export default function Game() {
   const hands = gameData.hands || {};
   const bids = gameData.bids || {};
   const phase = gameData.phase || "bidding";
+  const currentPlayer = gameData.currentPlayer;
+  const currentTrick = gameData.currentTrick || {};
   const myCards = hands[mySeat] || [];
   const suitOrder = {
     "♠": 0,
@@ -64,6 +66,28 @@ export default function Game() {
     }
     return rankOrder[b.rank] - rankOrder[a.rank];
   });
+  async function playCard(card) {
+    if (phase !== "playing") return;
+    if (currentPlayer !== mySeat) return;
+    const tableRef = doc(db, "tables", tableCode.toUpperCase());
+    const updatedHand = myCards.filter((c) => c.code !== card.code);
+    const updatedHands = {
+      ...hands,
+      updatedHand,
+    };
+    const updatedTrick = {
+      ...currentTrick,
+      card,
+    };
+    const order = ["seat1", "seat2", "seat3", "seat4"];
+    const currentIndex = order.indexOf(mySeat);
+    const nextPlayer = order[(currentIndex + 1) % 4];
+    await updateDoc(tableRef, {
+      hands: updatedHands,
+      currentTrick: updatedTrick,
+      currentPlayer: nextPlayer,
+    });
+  }
   return (
     <div
       style={{
@@ -143,6 +167,33 @@ export default function Game() {
        
       <div
         style={{
+          border: "2px solid green",
+          borderRadius: "10px",
+          padding: "15px",
+          width: "340px",
+        }}
+      >
+        <h3>TAVOLO</h3> 
+        <div>
+          Turno: <b>{players[currentPlayer]?.name}</b>
+        </div>
+         
+        <br /> 
+        {["seat1", "seat2", "seat3", "seat4"].map((seat) => (
+          <div
+            key={seat}
+            style={{
+              marginBottom: "6px",
+            }}
+          >
+            <b>{players[seat]?.name}</b> {" : "} 
+            {currentTrick[seat] ? currentTrick[seat].code : "-"}
+          </div>
+        ))}
+      </div>
+       
+      <div
+        style={{
           border: "1px solid #ccc",
           borderRadius: "10px",
           padding: "15px",
@@ -159,7 +210,12 @@ export default function Game() {
           }}
         >
           {sortedCards.map((card, index) => (
-            <Card key={index} card={card} />
+            <Card
+              key={index}
+              card={card}
+              disabled={phase !== "playing" || currentPlayer !== mySeat}
+              onClick={() => playCard(card)}
+            />
           ))}
         </div>
       </div>
@@ -173,23 +229,6 @@ export default function Game() {
           firstBidder={gameData.firstBidder}
           players={players}
         />
-      )}
-       
-      {phase === "playing" && (
-        <div
-          style={{
-            width: "340px",
-            border: "2px solid green",
-            borderRadius: "10px",
-            padding: "20px",
-            textAlign: "center",
-          }}
-        >
-          <h3>FASE DI GIOCO</h3> <p>Dichiarazioni completate</p> 
-          <p>
-            In attesa della prossima implementazione della giocata delle carte.
-          </p>
-        </div>
       )}
     </div>
   );
