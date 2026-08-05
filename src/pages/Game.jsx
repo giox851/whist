@@ -197,7 +197,7 @@ export default function Game() {
               <div
                 key={card.code}
                 style={{
-                  marginLeft: index === 0 ? 0 : -50,
+                  marginLeft: index === 0 ? 0 : -62,
                   transform: `
 rotate(${rotation}deg)
 translateY(${translateY}px)
@@ -210,7 +210,8 @@ translateY(${translateY}px)
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = `
 rotate(${rotation}deg)
-translateY(${translateY - 45}px)
+translateY(${translateY - 25}px)
+scale(1.06)
 `;
                   e.currentTarget.style.zIndex = "999";
                 }}
