@@ -67,7 +67,32 @@ export default function Game() {
     }
     return rankOrder[b.rank] - rankOrder[a.rank];
   });
+  function isPlayable(card) {
+  if (phase !== "playing") {
+    return false;
+  }
+  if (currentPlayer !== mySeat) {
+    return false;
+  }
+  const playedSeats = Object.keys(currentTrick);
+  // Primo giocatore della presa
+  if (playedSeats.length === 0) {
+    return true;
+  }
+  const firstSeat = playedSeats[0];
+  const leadSuit = currentTrick[firstSeat].suit;
+  const hasLeadSuit = myCards.some((c) => c.suit === leadSuit);
+  // Non possiedo il seme richiesto
+  if (!hasLeadSuit) {
+    return true;
+  }
+  // Possiedo il seme richiesto
+  return card.suit === leadSuit;
+}
   async function playCard(card) {
+    if (!isPlayable(card)) {
+      return;
+    }
     if (phase !== "playing") return;
     if (currentPlayer !== mySeat) return;
     const tableRef = doc(db, "tables", tableCode.toUpperCase());
@@ -193,6 +218,7 @@ export default function Game() {
             const distance = index - center;
             const rotation = distance * 6;
             const translateY = Math.abs(distance) * 5;
+            const playable = isPlayable(card);
             return (
               <div
                 key={card.code}
@@ -205,6 +231,8 @@ translateY(${translateY}px)
                   transformOrigin: "bottom center",
                   zIndex: index + 1,
                   transition: "all 0.25s ease",
+                  opacity: playable ? 1 : 0.25,
+                  filter: playable ? "none" : "grayscale(100%)",
                   overflow: "visible",
                 }}
                 onMouseEnter={(e) => {
@@ -225,9 +253,9 @@ translateY(${translateY}px)
               >
                 <Card
                   card={card}
-                  disabled={phase !== "playing" || currentPlayer !== mySeat}
-                  onClick={() => playCard(card)}
-                />
+                  playable={playable}
+                  disabled={!playable}
+                  onClick={() => playCard(card)}               />
               </div>
             );
           })}
