@@ -23,8 +23,8 @@ export default function Card({
         color: isRed ? "#d32f2f" : "#000",
         cursor: disabled ? "default" : "pointer",
         userSelect: "none",
-        opacity: playable ? 1 : 0.35,
-        filter: playable ? "none" : "grayscale(100%)",
+        opacity: disabled ? 0.35 : 1,
+        filter: disabled ? "grayscale(100%)" : "none",
         boxShadow: playable
           ? "0 4px 8px rgba(0,0,0,0.3)"
           : "0 2px 4px rgba(0,0,0,0.2)",

@@ -67,26 +67,26 @@ export default function Game() {
     }
     return rankOrder[b.rank] - rankOrder[a.rank];
   });
-  function isPlayable(card) {
+function isPlayable(card) {
   if (phase !== "playing") {
-    return false;
+    return true;
   }
   if (currentPlayer !== mySeat) {
-    return false;
+    return true;
   }
   const playedSeats = Object.keys(currentTrick);
-  // Primo giocatore della presa
+  // primo di mano
   if (playedSeats.length === 0) {
     return true;
   }
   const firstSeat = playedSeats[0];
   const leadSuit = currentTrick[firstSeat].suit;
   const hasLeadSuit = myCards.some((c) => c.suit === leadSuit);
-  // Non possiedo il seme richiesto
+  // non ho il seme
   if (!hasLeadSuit) {
     return true;
   }
-  // Possiedo il seme richiesto
+  // devo rispondere al seme
   return card.suit === leadSuit;
 }
   async function playCard(card) {
@@ -231,7 +231,7 @@ translateY(${translateY}px)
                   transformOrigin: "bottom center",
                   zIndex: index + 1,
                   transition: "all 0.25s ease",
-                  opacity: playable ? 1 : 0.25,
+                  opacity: playable ? 1 : 0.35,
                   filter: playable ? "none" : "grayscale(100%)",
                   overflow: "visible",
                 }}
@@ -254,7 +254,11 @@ translateY(${translateY}px)
                 <Card
                   card={card}
                   playable={playable}
-                  disabled={!playable}
+                  disabled={
+                  currentPlayer === mySeat
+                  ? !playable
+                  : false
+                  }
                   onClick={() => playCard(card)}               />
               </div>
             );
