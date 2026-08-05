@@ -4,6 +4,7 @@ export default function Card({ card, onClick, disabled = false }) {
     <div
       onClick={disabled ? undefined : onClick}
       style={{
+        position: "relative",
         width: "85px",
         height: "125px",
         backgroundColor: "white",
@@ -26,8 +27,9 @@ export default function Card({ card, onClick, disabled = false }) {
       {/* Angolo alto */} 
       <div
         style={{
-          lineHeight: "16px",
-          fontSize: "18px",
+          fontSize: "24px",
+          lineHeight: "21px",
+          paddingLeft: "3px",
         }}
       >
         <div>{card.rank}</div> <div>{card.suit}</div>
@@ -35,8 +37,11 @@ export default function Card({ card, onClick, disabled = false }) {
        {/* Centro */} 
       <div
         style={{
-          textAlign: "center",
-          fontSize: "34px",
+          position : "absolute",
+          bottom: "12px",
+          right: "8px",
+          fontSize: "26px",
+          opacity: 0.25,
         }}
       >
         {card.suit}
