@@ -171,38 +171,65 @@ export default function Game() {
        
       <div
         style={{
-          borderRadius: "12px",
-          padding: "15px",
           width: "100%",
-          maxWidth: "1000px",
-          background: "rgba(255,255,255,0.15)",
+          maxWidth: "1200px",
+          marginTop: "-80px",
+          zIndex: 50,
+          overflow: "visible",
         }}
       >
-        <h3
-          style={{
-            color: "white",
-            textAlign: "center",
-          }}
-        >
-          Le tue carte
-        </h3>
-         
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
-            gap: "8px",
             justifyContent: "center",
+            alignItems: "flex-end",
+            height: "260px",
+            overflow: "visible",
           }}
         >
-          {sortedCards.map((card, index) => (
-            <Card
-              key={index}
-              card={card}
-              disabled={phase !== "playing" || currentPlayer !== mySeat}
-              onClick={() => playCard(card)}
-            />
-          ))}
+          {sortedCards.map((card, index) => {
+            const totalCards = sortedCards.length;
+            const center = (totalCards - 1) / 2;
+            const distance = index - center;
+            const rotation = distance * 6;
+            const translateY = Math.abs(distance) * 5;
+            return (
+              <div
+                key={card.code}
+                style={{
+                  marginLeft: index === 0 ? 0 : -50,
+                  transform: `
+rotate(${rotation}deg)
+translateY(${translateY}px)
+`,
+                  transformOrigin: "bottom center",
+                  zIndex: index + 1,
+                  transition: "all 0.25s ease",
+                  overflow: "visible",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = `
+rotate(${rotation}deg)
+translateY(${translateY - 45}px)
+`;
+                  e.currentTarget.style.zIndex = "999";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = `
+rotate(${rotation}deg)
+translateY(${translateY}px)
+`;
+                  e.currentTarget.style.zIndex = index + 1;
+                }}
+              >
+                <Card
+                  card={card}
+                  disabled={phase !== "playing" || currentPlayer !== mySeat}
+                  onClick={() => playCard(card)}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
