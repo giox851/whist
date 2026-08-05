@@ -5,6 +5,7 @@ import { db } from "../services/firebase";
 import { getPlayerId } from "../services/player";
 import Bidding from "../components/Bidding";
 import Card from "../components/Card";
+import TableBoard from "../components/TableBoard";
 export default function Game() {
   const { tableCode } = useParams();
   const [gameData, setGameData] = useState(null);
@@ -77,7 +78,7 @@ export default function Game() {
     };
     const updatedTrick = {
       ...currentTrick,
-      [mySeat]:card,
+      [mySeat]: card,
     };
     const order = ["seat1", "seat2", "seat3", "seat4"];
     const currentIndex = order.indexOf(mySeat);
@@ -98,9 +99,14 @@ export default function Game() {
         padding: "20px",
         gap: "20px",
         fontFamily: "Arial",
+        background: "#0f5132",
       }}
     >
-      <h1>
+      <h1
+        style={{
+          color: "white",
+        }}
+      >
         PARTITA {gameData.currentGame || 1}
         {" / "}
         {gameData.gamesToPlay || 8}
@@ -113,6 +119,7 @@ export default function Game() {
           padding: "15px",
           width: "340px",
           textAlign: "center",
+          background: "white",
         }}
       >
         <div
@@ -141,66 +148,45 @@ export default function Game() {
         </div>
       </div>
        
-      <div
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "10px",
-          padding: "15px",
-          width: "340px",
-        }}
-      >
-        <h3>Giocatori</h3> 
-        {["seat1", "seat2", "seat3", "seat4"].map((seat) => (
-          <div
-            key={seat}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "8px",
-            }}
-          >
-            <span>{players[seat]?.name}</span> 
-            <span>🎯 {bids[seat] ?? "-"}</span>
-          </div>
-        ))}
-      </div>
+      {phase === "bidding" && (
+        <Bidding
+          tableCode={tableCode.toUpperCase()}
+          mySeat={mySeat}
+          currentBidder={gameData.currentBidder}
+          bids={bids}
+          firstBidder={gameData.firstBidder}
+          players={players}
+        />
+      )}
+       
+      {phase === "playing" && (
+        <TableBoard
+          players={players}
+          bids={bids}
+          tricksWon={gameData.tricksWon || {}}
+          currentPlayer={currentPlayer}
+          currentTrick={currentTrick}
+        />
+      )}
        
       <div
         style={{
-          border: "2px solid green",
-          borderRadius: "10px",
+          borderRadius: "12px",
           padding: "15px",
-          width: "340px",
+          width: "100%",
+          maxWidth: "1000px",
+          background: "rgba(255,255,255,0.15)",
         }}
       >
-        <h3>TAVOLO</h3> 
-        <div>
-          Turno: <b>{players[currentPlayer]?.name}</b>
-        </div>
+        <h3
+          style={{
+            color: "white",
+            textAlign: "center",
+          }}
+        >
+          Le tue carte
+        </h3>
          
-        <br /> 
-        {["seat1", "seat2", "seat3", "seat4"].map((seat) => (
-          <div
-            key={seat}
-            style={{
-              marginBottom: "6px",
-            }}
-          >
-            <b>{players[seat]?.name}</b> {" : "} 
-            {currentTrick[seat] ? currentTrick[seat].code : "-"}
-          </div>
-        ))}
-      </div>
-       
-      <div
-        style={{
-          border: "1px solid #ccc",
-          borderRadius: "10px",
-          padding: "15px",
-          width: "340px",
-        }}
-      >
-        <h3>Le tue carte</h3> 
         <div
           style={{
             display: "flex",
@@ -219,17 +205,6 @@ export default function Game() {
           ))}
         </div>
       </div>
-       
-      {phase === "bidding" && (
-        <Bidding
-          tableCode={tableCode.toUpperCase()}
-          mySeat={mySeat}
-          currentBidder={gameData.currentBidder}
-          bids={bids}
-          firstBidder={gameData.firstBidder}
-          players={players}
-        />
-      )}
     </div>
   );
 }
