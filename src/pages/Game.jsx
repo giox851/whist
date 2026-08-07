@@ -3,6 +3,7 @@ import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { useParams } from "react-router-dom";
 import { db } from "../services/firebase";
 import { getPlayerId } from "../services/player";
+import { getTrickWinner } from "../services/trickWinner";
 import Bidding from "../components/Bidding";
 import Card from "../components/Card";
 import TableBoard from "../components/TableBoard";
@@ -67,28 +68,28 @@ export default function Game() {
     }
     return rankOrder[b.rank] - rankOrder[a.rank];
   });
-function isPlayable(card) {
-  if (phase !== "playing") {
-    return true;
+  function isPlayable(card) {
+    if (phase !== "playing") {
+      return true;
+    }
+    if (currentPlayer !== mySeat) {
+      return true;
+    }
+    const playedSeats = Object.keys(currentTrick);
+    // primo di mano
+    if (playedSeats.length === 0) {
+      return true;
+    }
+    const firstSeat = playedSeats[0];
+    const leadSuit = currentTrick[firstSeat].suit;
+    const hasLeadSuit = myCards.some((c) => c.suit === leadSuit);
+    // non ho il seme
+    if (!hasLeadSuit) {
+      return true;
+    }
+    // devo rispondere al seme
+    return card.suit === leadSuit;
   }
-  if (currentPlayer !== mySeat) {
-    return true;
-  }
-  const playedSeats = Object.keys(currentTrick);
-  // primo di mano
-  if (playedSeats.length === 0) {
-    return true;
-  }
-  const firstSeat = playedSeats[0];
-  const leadSuit = currentTrick[firstSeat].suit;
-  const hasLeadSuit = myCards.some((c) => c.suit === leadSuit);
-  // non ho il seme
-  if (!hasLeadSuit) {
-    return true;
-  }
-  // devo rispondere al seme
-  return card.suit === leadSuit;
-}
   async function playCard(card) {
     if (!isPlayable(card)) {
       return;
@@ -105,14 +106,30 @@ function isPlayable(card) {
       ...currentTrick,
       [mySeat]: card,
     };
+    const trickSeats = Object.keys(updatedTrick);
     const order = ["seat1", "seat2", "seat3", "seat4"];
     const currentIndex = order.indexOf(mySeat);
     const nextPlayer = order[(currentIndex + 1) % 4];
-    await updateDoc(tableRef, {
-      hands: updatedHands,
-      currentTrick: updatedTrick,
-      currentPlayer: nextPlayer,
-    });
+    if (trickSeats.length === 4) {
+      const winnerSeat = getTrickWinner(updatedTrick, gameData.trumpSuit);
+      const updatedTricksWon = {
+        ...(gameData.tricksWon || {}),
+      };
+      updatedTricksWon[winnerSeat] = (updatedTricksWon[winnerSeat] || 0) + 1;
+      await updateDoc(tableRef, {
+        hands: updatedHands,
+        currentTrick: {},
+        currentPlayer: winnerSeat,
+        leadSeat: winnerSeat,
+        tricksWon: updatedTricksWon,
+      });
+    } else {
+      await updateDoc(tableRef, {
+        hands: updatedHands,
+        currentTrick: updatedTrick,
+        currentPlayer: nextPlayer,
+      });
+    }
   }
   return (
     <div
@@ -254,12 +271,9 @@ translateY(${translateY}px)
                 <Card
                   card={card}
                   playable={playable}
-                  disabled={
-                  currentPlayer === mySeat
-                  ? !playable
-                  : false
-                  }
-                  onClick={() => playCard(card)}               />
+                  disabled={currentPlayer === mySeat ? !playable : false}
+                  onClick={() => playCard(card)}
+                />
               </div>
             );
           })}
