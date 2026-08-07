@@ -83,7 +83,11 @@ export default function TableBoard({
               transform: "translateX(-50%)",
             }}
           >
-            {currentTrick.seat3 && <Card card={currentTrick.seat3} disabled />}
+            {currentTrick.seat4 && <Card
+              card={currentTrick.seat4}
+              tableCard={true}
+              disabled            
+            />}
           </div>
            {/* Ovest */} 
           <div
@@ -94,7 +98,11 @@ export default function TableBoard({
               transform: "translateY(-50%)",
             }}
           >
-            {currentTrick.seat2 && <Card card={currentTrick.seat2} disabled />}
+            {<currentTrick className="seat3"></currentTrick> && <Card
+              card={currentTrick.seat3}
+              tableCard={true}
+              disabled
+             />}
           </div>
            {/* Est */} 
           <div
@@ -105,7 +113,11 @@ export default function TableBoard({
               transform: "translateY(-50%)",
             }}
           >
-            {currentTrick.seat4 && <Card card={currentTrick.seat4} disabled />}
+            {currentTrick.seat2 && <Card
+              card={currentTrick.seat2}
+              tableCard={true}
+              disabled             
+            />}
           </div>
            {/* Sud */} 
           <div
@@ -116,7 +128,11 @@ export default function TableBoard({
               transform: "translateX(-50%)",
             }}
           >
-            {currentTrick.seat1 && <Card card={currentTrick.seat1} disabled />}
+            {currentTrick.seat1 && <Card
+              card={currentTrick.seat1}
+              tableCard={true}
+              disabled
+             />}
           </div>
         </div>
          {/* EST */} <div>{renderPlayer("seat4")}</div>

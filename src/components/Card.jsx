@@ -3,6 +3,8 @@ export default function Card({
   onClick,
   disabled = false,
   playable = true,
+  highlightMode = false,
+  tableCard = false,
 }) {
   const isRed = card.suit === "♥" || card.suit === "♦";
   return (
@@ -10,9 +12,14 @@ export default function Card({
       onClick={disabled ? undefined : onClick}
       style={{
         position: "relative",
-        width: "85px",
-        height: "125px",
-        background: "linear-gradient(to bottom, #ffffff, #f2f2f2)",
+        width: tableCard
+        ? "95px"
+        : "85px",
+
+        height: tableCard
+        ? "140px"
+        : "125px",
+       background: "linear-gradient(to bottom, #ffffff, #f2f2f2)",
         border: "2px solid #333",
         borderRadius: "10px",
         padding: "4px",
@@ -23,7 +30,9 @@ export default function Card({
         color: isRed ? "#d32f2f" : "#000",
         cursor: disabled ? "default" : "pointer",
         userSelect: "none",
-        opacity: disabled ? 0.35 : 1,
+        opacity: highlightMode
+        ? (playable ? 1 : 0.35)
+        : 1,
         filter: disabled ? "grayscale(100%)" : "none",
         boxShadow: playable
           ? "0 4px 8px rgba(0,0,0,0.3)"

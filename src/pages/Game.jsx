@@ -40,6 +40,7 @@ export default function Game() {
   const phase = gameData.phase || "bidding";
   const currentPlayer = gameData.currentPlayer;
   const currentTrick = gameData.currentTrick || {};
+  const leadSeat = gameData.leadSeat;
   const myCards = hands[mySeat] || [];
   const suitOrder = {
     "♠": 0,
@@ -68,28 +69,31 @@ export default function Game() {
     }
     return rankOrder[b.rank] - rankOrder[a.rank];
   });
-  function isPlayable(card) {
-    if (phase !== "playing") {
-      return true;
-    }
-    if (currentPlayer !== mySeat) {
-      return true;
-    }
-    const playedSeats = Object.keys(currentTrick);
-    // primo di mano
-    if (playedSeats.length === 0) {
-      return true;
-    }
-    const firstSeat = playedSeats[0];
-    const leadSuit = currentTrick[firstSeat].suit;
-    const hasLeadSuit = myCards.some((c) => c.suit === leadSuit);
-    // non ho il seme
-    if (!hasLeadSuit) {
-      return true;
-    }
-    // devo rispondere al seme
-    return card.suit === leadSuit;
+function isPlayable(card) {
+  if (phase !== "playing") {
+    return true;
   }
+  if (currentPlayer !== mySeat) {
+    return true;
+  }
+  const playedSeats = Object.keys(currentTrick);
+  if (playedSeats.length === 0) {
+    return true;
+  }
+  if (playedSeats.length === 4) {
+    return true;
+  }
+  const leadCard = currentTrick[leadSeat];
+  if (!leadCard) {
+    return true;
+  }
+  const leadSuit = leadCard.suit;
+  const hasLeadSuit = myCards.some((c) => c.suit === leadSuit);
+  if (!hasLeadSuit) {
+    return true;
+  }
+  return card.suit === leadSuit;
+}
   async function playCard(card) {
     if (!isPlayable(card)) {
       return;
@@ -111,18 +115,24 @@ export default function Game() {
     const currentIndex = order.indexOf(mySeat);
     const nextPlayer = order[(currentIndex + 1) % 4];
     if (trickSeats.length === 4) {
-      const winnerSeat = getTrickWinner(updatedTrick, gameData.trumpSuit);
-      const updatedTricksWon = {
-        ...(gameData.tricksWon || {}),
-      };
-      updatedTricksWon[winnerSeat] = (updatedTricksWon[winnerSeat] || 0) + 1;
+      // Mostra la quarta carta sul tavolo
       await updateDoc(tableRef, {
         hands: updatedHands,
-        currentTrick: {},
-        currentPlayer: winnerSeat,
-        leadSeat: winnerSeat,
-        tricksWon: updatedTricksWon,
+        currentTrick: updatedTrick,
       });
+      setTimeout(async () => {
+        const winnerSeat = getTrickWinner(updatedTrick, gameData.trumpSuit);
+        const updatedTricksWon = {
+          ...(gameData.tricksWon || {}),
+        };
+        updatedTricksWon[winnerSeat] = (updatedTricksWon[winnerSeat] || 0) + 1;
+        await updateDoc(tableRef, {
+          currentTrick: {},
+          currentPlayer: winnerSeat,
+          leadSeat: winnerSeat,
+          tricksWon: updatedTricksWon,
+        });
+      }, 1500);
     } else {
       await updateDoc(tableRef, {
         hands: updatedHands,
@@ -153,7 +163,6 @@ export default function Game() {
         {" / "}
         {gameData.gamesToPlay || 8}
       </h1>
-       
       <div
         style={{
           border: "3px solid orange",
