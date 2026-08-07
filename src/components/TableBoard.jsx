@@ -5,6 +5,7 @@ export default function TableBoard({
   tricksWon,
   currentPlayer,
   currentTrick,
+  lastTrickWinner,
 }) {
   function renderPlayer(seat) {
     const isTurn = currentPlayer === seat;
@@ -36,6 +37,20 @@ export default function TableBoard({
       </div>
     );
   }
+  function renderTableCard(seat) {
+    if (!currentTrick[seat]) {
+      return null;
+    }
+    return (
+      <Card
+        card={currentTrick[seat]}
+        playable={true}
+        highlightMode={false}
+        tableCard={true}
+        disabled
+      />
+    );
+  }
   return (
     <div
       style={{
@@ -45,6 +60,8 @@ export default function TableBoard({
         borderRadius: "20px",
         padding: "20px",
         color: "white",
+        boxShadow: "0 10px 25px rgba(0,0,0,0.35)",
+        border: "2px solid rgba(255,255,255,0.15)",
       }}
     >
       {/* NORD */} 
@@ -63,31 +80,50 @@ export default function TableBoard({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          minHeight: "250px",
+          minHeight: "280px",
         }}
       >
         {/* OVEST */} <div>{renderPlayer("seat2")}</div> {/* TAVOLO */} 
         <div
           style={{
-            width: "300px",
-            height: "220px",
+            width: "360px",
+            height: "260px",
             position: "relative",
           }}
         >
-          {/* Nord */} 
+          {lastTrickWinner && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                background: "rgba(0,0,0,0.75)",
+                color: "white",
+                padding: "12px 18px",
+                borderRadius: "999px",
+                fontWeight: "bold",
+                fontSize: "20px",
+                zIndex: 1000,
+                boxShadow: "0 0 18px rgba(255,215,0,0.8)",
+                border: "2px solid gold",
+                whiteSpace: "nowrap",
+              }}
+            >
+              🏆 Presa a {players[lastTrickWinner]?.name}
+            </div>
+          )}
+           {/* Nord */} 
           <div
             style={{
               position: "absolute",
               top: 0,
               left: "50%",
               transform: "translateX(-50%)",
+              zIndex: 10,
             }}
           >
-            {currentTrick.seat4 && <Card
-              card={currentTrick.seat4}
-              tableCard={true}
-              disabled            
-            />}
+            {renderTableCard("seat3")}
           </div>
            {/* Ovest */} 
           <div
@@ -96,13 +132,10 @@ export default function TableBoard({
               left: 0,
               top: "50%",
               transform: "translateY(-50%)",
+              zIndex: 10,
             }}
           >
-            {<currentTrick className="seat3"></currentTrick> && <Card
-              card={currentTrick.seat3}
-              tableCard={true}
-              disabled
-             />}
+            {renderTableCard("seat2")}
           </div>
            {/* Est */} 
           <div
@@ -111,13 +144,10 @@ export default function TableBoard({
               right: 0,
               top: "50%",
               transform: "translateY(-50%)",
+              zIndex: 10,
             }}
           >
-            {currentTrick.seat2 && <Card
-              card={currentTrick.seat2}
-              tableCard={true}
-              disabled             
-            />}
+            {renderTableCard("seat4")}
           </div>
            {/* Sud */} 
           <div
@@ -126,13 +156,10 @@ export default function TableBoard({
               bottom: 0,
               left: "50%",
               transform: "translateX(-50%)",
+              zIndex: 10,
             }}
           >
-            {currentTrick.seat1 && <Card
-              card={currentTrick.seat1}
-              tableCard={true}
-              disabled
-             />}
+            {renderTableCard("seat1")}
           </div>
         </div>
          {/* EST */} <div>{renderPlayer("seat4")}</div>

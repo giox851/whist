@@ -13,28 +13,38 @@ const rankValue = {
   3: 2,
   2: 1,
 };
-export function getTrickWinner(currentTrick, trumpSuit) {
-  const seats = Object.keys(currentTrick);
-  const leadSuit = currentTrick[seats[0]].suit;
-  let winnerSeat = seats[0];
-  let winningCard = currentTrick[winnerSeat];
-  for (const seat of seats.slice(1)) {
+export function getTrickWinner(currentTrick, trumpSuit, leadSeat) {
+  const leadCard = currentTrick[leadSeat];
+  if (!leadCard) {
+    return leadSeat;
+  }
+  const leadSuit = leadCard.suit;
+  let winnerSeat = leadSeat;
+  let winningCard = leadCard;
+  const seats = ["seat1", "seat2", "seat3", "seat4"];
+  for (const seat of seats) {
     const card = currentTrick[seat];
-    const challengerTrump = card.suit === trumpSuit;
-    const winnerTrump = winningCard.suit === trumpSuit;
-    if (challengerTrump && !winnerTrump) {
+    if (!card) {
+      continue;
+    }
+    if (seat === leadSeat) {
+      continue;
+    }
+    const cardIsTrump = card.suit === trumpSuit;
+    const winnerIsTrump = winningCard.suit === trumpSuit;
+    if (cardIsTrump && !winnerIsTrump) {
       winnerSeat = seat;
       winningCard = card;
       continue;
     }
-    if (challengerTrump && winnerTrump) {
+    if (cardIsTrump && winnerIsTrump) {
       if (rankValue[card.rank] > rankValue[winningCard.rank]) {
         winnerSeat = seat;
         winningCard = card;
       }
       continue;
     }
-    if (winnerTrump && !challengerTrump) {
+    if (winnerIsTrump && !cardIsTrump) {
       continue;
     }
     if (card.suit === leadSuit && winningCard.suit === leadSuit) {

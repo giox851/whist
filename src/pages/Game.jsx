@@ -41,6 +41,8 @@ export default function Game() {
   const currentPlayer = gameData.currentPlayer;
   const currentTrick = gameData.currentTrick || {};
   const leadSeat = gameData.leadSeat;
+  const trickResolving = gameData.trickResolving || false;
+  const lastTrickWinner = gameData.lastTrickWinner || null;
   const myCards = hands[mySeat] || [];
   const suitOrder = {
     "♠": 0,
@@ -69,39 +71,53 @@ export default function Game() {
     }
     return rankOrder[b.rank] - rankOrder[a.rank];
   });
-function isPlayable(card) {
-  if (phase !== "playing") {
-    return true;
+  function isPlayable(card) {
+    if (phase !== "playing") {
+      return true;
+    }
+    if (trickResolving) {
+      return true;
+    }
+    if (currentPlayer !== mySeat) {
+      return true;
+    }
+    const playedSeats = Object.keys(currentTrick);
+    if (playedSeats.length === 0) {
+      return true;
+    }
+    if (playedSeats.length === 4) {
+      return true;
+    }
+    const leadCard = currentTrick[leadSeat];
+    if (!leadCard) {
+      return true;
+    }
+    const leadSuit = leadCard.suit;
+    const hasLeadSuit = myCards.some(
+      (cardInHand) => cardInHand.suit === leadSuit,
+    );
+    if (!hasLeadSuit) {
+      return true;
+    }
+    return card.suit === leadSuit;
   }
-  if (currentPlayer !== mySeat) {
-    return true;
-  }
-  const playedSeats = Object.keys(currentTrick);
-  if (playedSeats.length === 0) {
-    return true;
-  }
-  if (playedSeats.length === 4) {
-    return true;
-  }
-  const leadCard = currentTrick[leadSeat];
-  if (!leadCard) {
-    return true;
-  }
-  const leadSuit = leadCard.suit;
-  const hasLeadSuit = myCards.some((c) => c.suit === leadSuit);
-  if (!hasLeadSuit) {
-    return true;
-  }
-  return card.suit === leadSuit;
-}
   async function playCard(card) {
+    if (trickResolving) {
+      return;
+    }
     if (!isPlayable(card)) {
       return;
     }
-    if (phase !== "playing") return;
-    if (currentPlayer !== mySeat) return;
+    if (phase !== "playing") {
+      return;
+    }
+    if (currentPlayer !== mySeat) {
+      return;
+    }
     const tableRef = doc(db, "tables", tableCode.toUpperCase());
-    const updatedHand = myCards.filter((c) => c.code !== card.code);
+    const updatedHand = myCards.filter(
+      (cardInHand) => cardInHand.code !== card.code,
+    );
     const updatedHands = {
       ...hands,
       [mySeat]: updatedHand,
@@ -115,13 +131,25 @@ function isPlayable(card) {
     const currentIndex = order.indexOf(mySeat);
     const nextPlayer = order[(currentIndex + 1) % 4];
     if (trickSeats.length === 4) {
-      // Mostra la quarta carta sul tavolo
       await updateDoc(tableRef, {
-        hands: updatedHands,
-        currentTrick: updatedTrick,
+        lastTrickWinner: winnerSeat,
+        currentPlayer: winnerSeat,
+        leadSeat: winnerSeat,
+        tricksWon: updatedTricksWon,
+        trickResolving: false,
       });
       setTimeout(async () => {
-        const winnerSeat = getTrickWinner(updatedTrick, gameData.trumpSuit);
+        await updateDoc(tableRef, {
+          currentTrick: {},
+          lastTrickWinner: null,
+        });
+      }, 1200);     
+      setTimeout(async () => {
+        const winnerSeat = getTrickWinner(
+          updatedTrick,
+          gameData.trumpSuit,
+          leadSeat,
+        );
         const updatedTricksWon = {
           ...(gameData.tricksWon || {}),
         };
@@ -131,15 +159,16 @@ function isPlayable(card) {
           currentPlayer: winnerSeat,
           leadSeat: winnerSeat,
           tricksWon: updatedTricksWon,
+          trickResolving: false,
         });
       }, 1500);
-    } else {
-      await updateDoc(tableRef, {
-        hands: updatedHands,
-        currentTrick: updatedTrick,
-        currentPlayer: nextPlayer,
-      });
+      return;
     }
+    await updateDoc(tableRef, {
+      hands: updatedHands,
+      currentTrick: updatedTrick,
+      currentPlayer: nextPlayer,
+    });
   }
   return (
     <div
@@ -163,6 +192,7 @@ function isPlayable(card) {
         {" / "}
         {gameData.gamesToPlay || 8}
       </h1>
+       
       <div
         style={{
           border: "3px solid orange",
@@ -197,6 +227,18 @@ function isPlayable(card) {
         <div>
           <b>Il tuo posto:</b> {mySeat}
         </div>
+         
+        {trickResolving && (
+          <div
+            style={{
+              marginTop: "8px",
+              color: "#b45309",
+              fontWeight: "bold",
+            }}
+          >
+            Presa in valutazione...
+          </div>
+        )}
       </div>
        
       {phase === "bidding" && (
@@ -217,6 +259,7 @@ function isPlayable(card) {
           tricksWon={gameData.tricksWon || {}}
           currentPlayer={currentPlayer}
           currentTrick={currentTrick}
+          lastTrickWinner={lastTrickWinner}
         />
       )}
        
@@ -245,6 +288,11 @@ function isPlayable(card) {
             const rotation = distance * 6;
             const translateY = Math.abs(distance) * 5;
             const playable = isPlayable(card);
+            const shouldDisable =
+              phase !== "playing" ||
+              trickResolving ||
+              currentPlayer !== mySeat ||
+              !playable;
             return (
               <div
                 key={card.code}
@@ -261,26 +309,27 @@ translateY(${translateY}px)
                   filter: playable ? "none" : "grayscale(100%)",
                   overflow: "visible",
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = `
+                onMouseEnter={(event) => {
+                  if (shouldDisable) return;
+                  event.currentTarget.style.transform = `
 rotate(${rotation}deg)
 translateY(${translateY - 25}px)
 scale(1.06)
 `;
-                  e.currentTarget.style.zIndex = "999";
+                  event.currentTarget.style.zIndex = "999";
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = `
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.transform = `
 rotate(${rotation}deg)
 translateY(${translateY}px)
 `;
-                  e.currentTarget.style.zIndex = index + 1;
+                  event.currentTarget.style.zIndex = index + 1;
                 }}
               >
                 <Card
                   card={card}
                   playable={playable}
-                  disabled={currentPlayer === mySeat ? !playable : false}
+                  disabled={shouldDisable}
                   onClick={() => playCard(card)}
                 />
               </div>
