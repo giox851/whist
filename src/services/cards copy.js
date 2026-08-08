@@ -1,5 +1,3 @@
-const TEST_MODE = true;
-const CARDS_PER_PLAYER = TEST_MODE ? 2 : 13;
 export function createDeck() {
   const suits = ["♠", "♥", "♦", "♣"];
   const ranks = [
@@ -39,9 +37,9 @@ export function shuffleDeck(deck) {
 }
 export function dealCards(deck) {
   return {
-    seat1: deck.slice(0, CARDS_PER_PLAYER),
-    seat2: deck.slice(CARDS_PER_PLAYER, CARDS_PER_PLAYER * 2),
-    seat3: deck.slice(CARDS_PER_PLAYER * 2, CARDS_PER_PLAYER * 3),
-    seat4: deck.slice(CARDS_PER_PLAYER * 3, CARDS_PER_PLAYER * 4),
+    seat1: deck.slice(0, 13),
+    seat2: deck.slice(13, 26),
+    seat3: deck.slice(26, 39),
+    seat4: deck.slice(39, 52),
   };
 }
