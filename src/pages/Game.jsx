@@ -7,6 +7,7 @@ import { getTrickWinner } from "../services/trickWinner";
 import Bidding from "../components/Bidding";
 import Card from "../components/Card";
 import TableBoard from "../components/TableBoard";
+import { calculateScores } from "../services/scoring";
 export default function Game() {
   const { tableCode } = useParams();
   const [gameData, setGameData] = useState(null);
@@ -145,14 +146,34 @@ export default function Game() {
         const updatedTricksWon = {
           ...(gameData.tricksWon || {}),
         };
+
         updatedTricksWon[winnerSeat] = (updatedTricksWon[winnerSeat] || 0) + 1;
-        await updateDoc(tableRef, {
+
+        const handFinished = Object.values(updatedHands).every(
+          (hand) => hand.length === 0,
+        );
+        let updatedScores = gameData.scores || {};
+        if (handFinished) {
+          updatedScores = calculateScores(
+            bids,
+            updatedTricksWon,
+            gameData.scores || {},
+          );
+        }
+
+        const updateData = {
           lastTrickWinner: winnerSeat,
           currentPlayer: winnerSeat,
           leadSeat: winnerSeat,
           tricksWon: updatedTricksWon,
           trickResolving: false,
-        });
+        };
+        if (handFinished) {
+          updateData.phase = "roundEnd";
+          updateData.scores = updatedScores;
+        }
+        await updateDoc(tableRef, updateData);
+
         setTimeout(async () => {
           await updateDoc(tableRef, {
             currentTrick: {},
@@ -190,7 +211,7 @@ export default function Game() {
         {" / "}
         {gameData.gamesToPlay || 8}
       </h1>
-       
+    
       <div
         style={{
           border: "3px solid orange",
@@ -208,7 +229,7 @@ export default function Game() {
         >
           {gameData.trumpSuit}
         </div>
-         
+      
         <div
           style={{
             fontWeight: "bold",
@@ -216,16 +237,16 @@ export default function Game() {
         >
           BRISCOLA
         </div>
-         
-        <br /> 
+        
+        <br />
         <div>
           <b>Fase:</b> {phase}
         </div>
-         
+        
         <div>
           <b>Il tuo posto:</b> {mySeat}
         </div>
-         
+        
         {trickResolving && (
           <div
             style={{
@@ -238,7 +259,7 @@ export default function Game() {
           </div>
         )}
       </div>
-       
+      
       {phase === "bidding" && (
         <Bidding
           tableCode={tableCode.toUpperCase()}
@@ -249,7 +270,7 @@ export default function Game() {
           players={players}
         />
       )}
-       
+      
       {phase === "playing" && (
         <TableBoard
           players={players}
@@ -260,7 +281,25 @@ export default function Game() {
           lastTrickWinner={lastTrickWinner}
         />
       )}
-       
+      {  phase === "roundEnd" && (
+    <div
+      style={{
+        background: "white",
+        padding: "20px",
+        borderRadius: "12px",
+        minWidth: "500px",
+      }}
+    >
+      <h2>🏁 Fine Mano</h2>
+            {["seat1", "seat2", "seat3", "seat4"].map((seat) => (
+        <div key={seat}>
+          {players[seat]?.name} | Dich: {bids[seat] || 0} | Prese:{" "}
+          {gameData.tricksWon?.[seat] || 0} | Totale:{" "}
+          {gameData.scores?.[seat] || 0}
+        </div>
+      ))}
+    </div>
+  )}
       <div
         style={{
           width: "100%",

@@ -31,11 +31,11 @@ export default function Card({
         cursor: disabled ? "default" : "pointer",
         userSelect: "none",
         opacity: highlightMode
-        ? (playable ? 1 : 0.35)
+        ? (playable ? 1 : 0.70)
         : 1,
-        filter: disabled ? "grayscale(100%)" : "none",
+        filter: highlightMode && !playable ? "grayscale(70%)" : "none",
         boxShadow: playable
-          ? "0 4px 8px rgba(0,0,0,0.3)"
+          ? "0 4px 10px rgba(0,0,0,0.35)"
           : "0 2px 4px rgba(0,0,0,0.2)",
         transition:
           "transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease",
