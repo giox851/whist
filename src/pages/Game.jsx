@@ -132,18 +132,10 @@ export default function Game() {
     const nextPlayer = order[(currentIndex + 1) % 4];
     if (trickSeats.length === 4) {
       await updateDoc(tableRef, {
-        lastTrickWinner: winnerSeat,
-        currentPlayer: winnerSeat,
-        leadSeat: winnerSeat,
-        tricksWon: updatedTricksWon,
-        trickResolving: false,
+        hands: updatedHands,
+        currentTrick: updatedTrick,
+        trickResolving: true,
       });
-      setTimeout(async () => {
-        await updateDoc(tableRef, {
-          currentTrick: {},
-          lastTrickWinner: null,
-        });
-      }, 1200);     
       setTimeout(async () => {
         const winnerSeat = getTrickWinner(
           updatedTrick,
@@ -155,12 +147,18 @@ export default function Game() {
         };
         updatedTricksWon[winnerSeat] = (updatedTricksWon[winnerSeat] || 0) + 1;
         await updateDoc(tableRef, {
-          currentTrick: {},
+          lastTrickWinner: winnerSeat,
           currentPlayer: winnerSeat,
           leadSeat: winnerSeat,
           tricksWon: updatedTricksWon,
           trickResolving: false,
         });
+        setTimeout(async () => {
+          await updateDoc(tableRef, {
+            currentTrick: {},
+            lastTrickWinner: null,
+          });
+        }, 1200);
       }, 1500);
       return;
     }
