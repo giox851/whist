@@ -281,25 +281,48 @@ export default function Game() {
           lastTrickWinner={lastTrickWinner}
         />
       )}
-      {  phase === "roundEnd" && (
-    <div
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "12px",
-        minWidth: "500px",
-      }}
-    >
-      <h2>🏁 Fine Mano</h2>
-            {["seat1", "seat2", "seat3", "seat4"].map((seat) => (
-        <div key={seat}>
-          {players[seat]?.name} | Dich: {bids[seat] || 0} | Prese:{" "}
-          {gameData.tricksWon?.[seat] || 0} | Totale:{" "}
-          {gameData.scores?.[seat] || 0}
+
+      {phase === "roundEnd" && (
+        <div
+          style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "12px",
+            minWidth: "600px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              marginBottom: "20px",
+            }}
+          >
+            🏁 Fine Mano
+          </h2>
+          
+          {["seat1", "seat2", "seat3", "seat4"].map((seat) => {
+            const bid = bids[seat] || 0;
+            const tricks = gameData.tricksWon?.[seat] || 0;
+            const roundPoints = tricks === bid ? tricks + 10 : tricks;
+            return (
+              <div
+                key={seat}
+                style={{
+                  padding: "10px 0",
+                  borderBottom: "1px solid #ddd",
+                }}
+              >
+                <strong>{players[seat]?.name}</strong>{" | "}
+                Dichiarato: {bid}{" | "}
+                Prese: {tricks}{" | "}
+                Punti Mano: +{roundPoints}{" | "}
+                Totale: {gameData.scores?.[seat] || 0}
+              </div>
+            );
+          })}
         </div>
-      ))}
-    </div>
-  )}
+      )}
       <div
         style={{
           width: "100%",
