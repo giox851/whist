@@ -189,6 +189,13 @@ export default function Game() {
       currentPlayer: nextPlayer,
     });
   }
+  async function startNextRound() {
+    const order = ["seat1", "seat2", "seat3", "seat4"];
+    const currentFirst = gameData.firstBidder;
+    const currentIndex = order.indexOf(currentFirst);
+    const nextFirstBidder = order[(currentIndex + 1) % 4];
+    console.log("Nuovo primo dichiarante:", nextFirstBidder);
+  }  
   return (
     <div
       style={{
@@ -305,6 +312,17 @@ export default function Game() {
             const bid = bids[seat] || 0;
             const tricks = gameData.tricksWon?.[seat] || 0;
             const roundPoints = tricks === bid ? tricks + 10 : tricks;
+            {  mySeat !== "seat1" && (
+                <div
+                  style={{
+                    marginTop: "20px",
+                    textAlign: "center",
+                    fontWeight: "bold",
+                  }}
+                >
+                  In attesa che Giovanni avvii la mano successiva...
+                </div>
+              )}
             return (
               <div
                 key={seat}
@@ -321,6 +339,17 @@ export default function Game() {
               </div>
             );
           })}
+          <button
+            onClick={startNextRound}
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              fontSize: "18px",
+              cursor: "pointer",
+            }}
+          >
+            ▶ Prossima Mano
+          </button>;
         </div>
       )}
       <div
