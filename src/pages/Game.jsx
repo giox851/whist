@@ -337,17 +337,7 @@ async function startNextRound() {
             const bid = bids[seat] || 0;
             const tricks = gameData.tricksWon?.[seat] || 0;
             const roundPoints = tricks === bid ? tricks + 10 : tricks;
-            {  mySeat !== "seat1" && (
-                <div
-                  style={{
-                    marginTop: "20px",
-                    textAlign: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  In attesa che Giovanni avvii la mano successiva...
-                </div>
-              )}
+          
             return (
               <div
                 key={seat}
