@@ -8,6 +8,7 @@ import Bidding from "../components/Bidding";
 import Card from "../components/Card";
 import TableBoard from "../components/TableBoard";
 import { calculateScores } from "../services/scoring";
+import { createDeck, shuffleDeck, dealCards } from "../services/cards";
 export default function Game() {
   const { tableCode } = useParams();
   const [gameData, setGameData] = useState(null);
@@ -189,13 +190,37 @@ export default function Game() {
       currentPlayer: nextPlayer,
     });
   }
-  async function startNextRound() {
-    const order = ["seat1", "seat2", "seat3", "seat4"];
-    const currentFirst = gameData.firstBidder;
-    const currentIndex = order.indexOf(currentFirst);
-    const nextFirstBidder = order[(currentIndex + 1) % 4];
-    console.log("Nuovo primo dichiarante:", nextFirstBidder);
-  }  
+async function startNextRound() {
+  const order = ["seat1", "seat2", "seat3", "seat4"];
+  const currentFirst = gameData.firstBidder;
+  const currentIndex = order.indexOf(currentFirst);
+  const nextFirstBidder = order[(currentIndex + 1) % 4];
+  const deck = shuffleDeck(createDeck());
+  const hands = dealCards(deck);
+  const nextGame = (gameData.currentGame || 1) + 1;
+  const trumpCard = deck[deck.length - 1];
+  const tableRef = doc(db, "tables", tableCode.toUpperCase());
+  await updateDoc(tableRef, {
+    currentGame: nextGame,
+    phase: "bidding",
+    hands,
+    bids: {},
+    currentTrick: {},
+    tricksWon: {
+      seat1: 0,
+      seat2: 0,
+      seat3: 0,
+      seat4: 0,
+    },
+    firstBidder: nextFirstBidder,
+    currentBidder: nextFirstBidder,
+    currentPlayer: null,
+    leadSeat: null,
+    lastTrickWinner: null,
+    trickResolving: false,
+    trumpSuit: trumpCard.suit,
+  });
+}
   return (
     <div
       style={{
