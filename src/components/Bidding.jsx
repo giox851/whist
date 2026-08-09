@@ -48,7 +48,7 @@ export default function Bidding({
         phase: "playing",
         currentBidder: null,
         currentPlayer: firstBidder,
-        leadseat: firstBidder,
+        leadSeat: firstBidder,
         currentTrick: {},
       });
       return;
