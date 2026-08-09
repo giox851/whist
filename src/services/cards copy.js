@@ -1,3 +1,6 @@
+const TEST_MODE = true;
+const CARDS_PER_PLAYER = TEST_MODE ? 2 : 13;
+
 export function createDeck() {
   const suits = ["♠", "♥", "♦", "♣"];
   const ranks = [

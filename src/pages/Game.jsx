@@ -339,6 +339,8 @@ export default function Game() {
               </div>
             );
           })}
+          {
+            mySeat === "seat1" ? (
           <button
             onClick={startNextRound}
             style={{
@@ -346,12 +348,33 @@ export default function Game() {
               padding: "10px 20px",
               fontSize: "18px",
               cursor: "pointer",
+              background: "#1976d2",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              display: "block",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
             ▶ Prossima Mano
-          </button>;
+          </button>
+            ) : (
+              <div
+                style={{
+                  marginTop: "20px",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  color: "#666",
+                }}
+              >
+                In attesa dell'avvio della mano successiva...
+              </div>
+            )
+          }
         </div>
       )}
+    
       <div
         style={{
           width: "100%",
