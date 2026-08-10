@@ -252,7 +252,7 @@ async function startNextRound() {
           border: "3px solid orange",
           borderRadius: "12px",
           padding: "15px",
-          width: isMobile ? "220px" : "340px",
+          width: isMobile ? "180px" : "340px",
           textAlign: "center",
           background: "white",
         }}
@@ -406,7 +406,7 @@ async function startNextRound() {
         style={{
           width: "100%",
           maxWidth: isMobile ? "100vw" : "1200px",
-          marginTop: isMobile ? "-180px" : "-80px",
+          marginTop: isMobile ? "-280px" : "-80px",
           zIndex: 50,
           overflow: "visible",
           paddingleft: isMobile ? "5px" : "0",
@@ -418,7 +418,7 @@ async function startNextRound() {
             display: "flex",
             justifyContent: "center",
             alignItems: "flex-end",
-            height: isMobile ? "170px" : "260px",
+            height: isMobile ? "100px" : "260px",
             overflow: "visible",
           }}
         >

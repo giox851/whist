@@ -73,13 +73,24 @@ export default function Bidding({
         style={{
           border: "1px solid #ccc",
           borderRadius: "10px",
-          padding: "15px",
-          width: "340px",
+          padding: isMobile ? "8px" : "15px",
+          width: isMobile ? "180px" : "340px",
         }}
       >
-        <h3>Dichiarazioni</h3> 
+        <h3
+        style={{
+        fontSize: isMobile ? "18px" : "24px",
+        margin: "5px 0",
+        }}
+        >
+        Dichiarazioni
+        </h3>
         {orderedSeats.map((seat) => (
-          <div key={seat}>
+          <div key={seat}
+          style={{
+            fontSize: isMobile ? "14px" : "20px",
+            lineHeight: isMobile ? "20px" : "32px",
+            }}>
             <b>{players[seat]?.name || seat}</b>
             {" : "}
             {bids[seat] !== undefined ? bids[seat] : "-"}
@@ -92,15 +103,18 @@ export default function Bidding({
           In attesa della dichiarazione di <b>{players[currentBidder]?.name}</b>
         </div>
       )}
-       
+      
       {isMyTurn && (
         <>
           <h3>Tocca a te dichiarare</h3> 
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, 60px)",
-              gap: "10px",
+              gridTemplateColumns:
+              isMobile
+              ? "repeat(4, 42px)"
+              : "repeat(4, 60px)",
+              gap: isMobile ? "6px" : "10px",
             }}
           >
             {availableValues.map((value) => (
@@ -108,8 +122,8 @@ export default function Bidding({
                 key={value}
                 onClick={() => declareBid(value)}
                 style={{
-                  height: "50px",
-                  fontSize: "18px",
+                  height: isMobile ? "38px" : "50px",
+                  fontSize: isMobile ? "14px" : "18px",
                   fontWeight: "bold",
                   cursor: "pointer",
                 }}
