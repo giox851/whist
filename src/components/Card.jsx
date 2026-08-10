@@ -7,18 +7,19 @@ export default function Card({
   tableCard = false,
 }) {
   const isRed = card.suit === "♥" || card.suit === "♦";
+  const isMobile = window.innerWidth < 768;
   return (
     <div
       onClick={disabled ? undefined : onClick}
       style={{
         position: "relative",
         width: tableCard
-        ? "95px"
-        : "85px",
+        ? (isMobile ? "58px" : "95px")
+        : (isMobile ? "42px" : "85px"),
 
         height: tableCard
-        ? "140px"
-        : "125px",
+        ? (isMobile ? "90px" : "140px")
+        : (isMobile ? "65px" : "125px"),
        background: "linear-gradient(to bottom, #ffffff, #f2f2f2)",
         border: "2px solid #333",
         borderRadius: "10px",
@@ -45,7 +46,7 @@ export default function Card({
       {/* Angolo alto */} 
       <div
         style={{
-          fontSize: "24px",
+          fontSize: isMobile ? "12px" : "24px",
           lineHeight: "21px",
           paddingLeft: "3px",
           textAlign: "left",
@@ -54,25 +55,25 @@ export default function Card({
         <div>{card.rank}</div>
         <div>{card.suit}</div>
       </div>
-       {/* Seme decorativo */} 
+      {/* Seme decorativo */}
       <div
         style={{
           position: "absolute",
           bottom: "12px",
           right: "8px",
-          fontSize: "26px",
+          fontSize: isMobile ? "16px" : "26px",
           opacity: 0.25,
         }}
       >
         {card.suit}
       </div>
-       {/* Angolo basso */} 
+      {/* Angolo basso */}
       <div
         style={{
           lineHeight: "16px",
           transform: "rotate(180deg)",
           textAlign: "right",
-          fontSize: "18px",
+          fontSize: isMobile ? "11px" : "18px",
         }}
       >
         <div>{card.rank}</div>

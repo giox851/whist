@@ -46,6 +46,7 @@ export default function Game() {
   const trickResolving = gameData.trickResolving || false;
   const lastTrickWinner = gameData.lastTrickWinner || null;
   const myCards = hands[mySeat] || [];
+  const isMobile = window.innerWidth < 768;
   const suitOrder = {
     "♠": 0,
     "♥": 1,
@@ -237,6 +238,8 @@ async function startNextRound() {
       <h1
         style={{
           color: "white",
+          fontSize: isMobile ? "34px" : "52px",
+          marginBottom: isMobile ? "10px" : "20px",
         }}
       >
         PARTITA {gameData.currentGame || 1}
@@ -249,14 +252,14 @@ async function startNextRound() {
           border: "3px solid orange",
           borderRadius: "12px",
           padding: "15px",
-          width: "340px",
+          width: isMobile ? "220px" : "340px",
           textAlign: "center",
           background: "white",
         }}
       >
         <div
           style={{
-            fontSize: "42px",
+            fontSize: isMobile ? "28px" : "42px",
           }}
         >
           {gameData.trumpSuit}
@@ -303,16 +306,25 @@ async function startNextRound() {
         />
       )}
       
-      {phase === "playing" && (
-        <TableBoard
-          players={players}
-          bids={bids}
-          tricksWon={gameData.tricksWon || {}}
-          currentPlayer={currentPlayer}
-          currentTrick={currentTrick}
-          lastTrickWinner={lastTrickWinner}
-        />
-      )}
+{
+  phase === "playing" && (
+    <div
+      style={{
+        transform: isMobile ? "scale(0.6)" : "scale(1)",
+        transformOrigin: "top center",
+      }}
+    >
+      <TableBoard
+        players={players}
+        bids={bids}
+        tricksWon={gameData.tricksWon || {}}
+        currentPlayer={currentPlayer}
+        currentTrick={currentTrick}
+        lastTrickWinner={lastTrickWinner}
+      />
+    </div>
+  )
+}
 
       {phase === "roundEnd" && (
         <div
@@ -393,10 +405,12 @@ async function startNextRound() {
       <div
         style={{
           width: "100%",
-          maxWidth: "1200px",
-          marginTop: "-80px",
+          maxWidth: isMobile ? "100vw" : "1200px",
+          marginTop: isMobile ? "-180px" : "-80px",
           zIndex: 50,
           overflow: "visible",
+          paddingleft: isMobile ? "5px" : "0",
+          paddingRight: isMobile ? "5px" : "0",
         }}
       >
         <div
@@ -404,7 +418,7 @@ async function startNextRound() {
             display: "flex",
             justifyContent: "center",
             alignItems: "flex-end",
-            height: "260px",
+            height: isMobile ? "170px" : "260px",
             overflow: "visible",
           }}
         >
@@ -424,7 +438,12 @@ async function startNextRound() {
               <div
                 key={card.code}
                 style={{
-                  marginLeft: index === 0 ? 0 : -62,
+              marginLeft:
+              index === 0
+              ? 0
+              : isMobile
+              ? -20
+              : -62,
                   transform: `
 rotate(${rotation}deg)
 translateY(${translateY}px)
