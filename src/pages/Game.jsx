@@ -406,10 +406,10 @@ async function startNextRound() {
         style={{
           width: "100%",
           maxWidth: isMobile ? "100vw" : "1200px",
-          marginTop: isMobile ? "-280px" : "-80px",
+          marginTop: isMobile ? "0px" : "-80px",
           zIndex: 50,
           overflow: "visible",
-          paddingleft: isMobile ? "5px" : "0",
+          paddingLeft: isMobile ? "5px" : "0",
           paddingRight: isMobile ? "5px" : "0",
         }}
       >
