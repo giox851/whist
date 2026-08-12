@@ -8,6 +8,7 @@ export default function Bidding({
   firstBidder,
   players,
 }) {
+  const isMobile = window.innerWidth < 768;
   const validSeats = ["seat1", "seat2", "seat3", "seat4"];
   const firstIndex = validSeats.indexOf(firstBidder);
   const orderedSeats = [];
