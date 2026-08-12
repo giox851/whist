@@ -252,7 +252,7 @@ async function startNextRound() {
           border: "3px solid orange",
           borderRadius: "12px",
           padding: "15px",
-          width: isMobile ? "180px" : "340px",
+          width: isMobile ? "260px" : "340px",
           textAlign: "center",
           background: "white",
         }}
@@ -310,7 +310,7 @@ async function startNextRound() {
   phase === "playing" && (
     <div
       style={{
-        transform: isMobile ? "scale(0.6)" : "scale(1)",
+        transform: isMobile ? "scale(8)" : "scale(1)",
         transformOrigin: "top center",
       }}
     >
@@ -332,7 +332,8 @@ async function startNextRound() {
             background: "white",
             padding: "20px",
             borderRadius: "12px",
-            minWidth: "600px",
+            minWidth: isMobile ? "90%" : "600px",
+            fontSize: isMobile ? "13px" : "16px",
             boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
           }}
         >
@@ -354,8 +355,9 @@ async function startNextRound() {
               <div
                 key={seat}
                 style={{
-                  padding: "10px 0",
+                  padding: "8px 0",
                   borderBottom: "1px solid #ddd",
+                  fontSize: isMobile ? "12px" : "16px",
                 }}
               >
                 <strong>{players[seat]?.name}</strong>{" | "}
@@ -418,7 +420,7 @@ async function startNextRound() {
             display: "flex",
             justifyContent: "center",
             alignItems: "flex-end",
-            height: isMobile ? "100px" : "260px",
+            height: isMobile ? "180px" : "260px",
             overflow: "visible",
           }}
         >
