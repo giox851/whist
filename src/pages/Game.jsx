@@ -310,7 +310,7 @@ async function startNextRound() {
   phase === "playing" && (
     <div
       style={{
-        transform: isMobile ? "scale(8)" : "scale(1)",
+        transform: isMobile ? "scale(0.7)" : "scale(1)",
         transformOrigin: "top center",
       }}
     >
