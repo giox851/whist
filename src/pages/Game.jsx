@@ -420,7 +420,7 @@ async function startNextRound() {
             display: "flex",
             justifyContent: "center",
             alignItems: "flex-end",
-            height: isMobile ? "180px" : "260px",
+            height: isMobile ? "90px" : "260px",
             overflow: "visible",
           }}
         >

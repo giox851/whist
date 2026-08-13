@@ -107,7 +107,12 @@ export default function Bidding({
       
       {isMyTurn && (
         <>
-          <h3>Tocca a te dichiarare</h3> 
+          <h3
+            style={{
+            fontSize: isMobile ? "18px" : "26px",
+            }}
+            >
+              Tocca a te dichiarare</h3>
           <div
             style={{
               display: "grid",

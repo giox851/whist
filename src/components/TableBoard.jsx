@@ -91,8 +91,8 @@ export default function TableBoard({
         {/* OVEST */}<div>{renderPlayer("seat2")}</div>{/* TAVOLO */}
         <div
           style={{
-            width: isMobile ? "210px" : "360px",
-            height: isMobile ? "150px" : "260px",
+            width: isMobile ? "180px" : "360px",
+            height: isMobile ? "130px" : "260px",
             position: "relative",
           }}
         >
