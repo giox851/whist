@@ -201,6 +201,15 @@ async function startNextRound() {
   const nextGame = (gameData.currentGame || 1) + 1;
   const trumpCard = deck[deck.length - 1];
   const tableRef = doc(db, "tables", tableCode.toUpperCase());
+    if (gameData.currentGame >= gameData.gamesToPlay) {
+  const tableRef = doc(db, "tables", tableCode.toUpperCase());
+
+  await updateDoc(tableRef, {
+    phase: "gameEnd",
+  });
+
+  return;
+  }
   await updateDoc(tableRef, {
     currentGame: nextGame,
     phase: "bidding",
@@ -403,7 +412,51 @@ async function startNextRound() {
           }
         </div>
       )}
-    
+      {
+      phase === "gameEnd" && (
+        <div
+          style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "12px",
+            minWidth: isMobile ? "90%" : "600px",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+            }}
+          >
+            🏆 Classifica Finale
+          </h2>
+
+          {[...Object.keys(players)]
+            .sort(
+              (a, b) => (gameData.scores?.[b] || 0) - (gameData.scores?.[a] || 0),
+            )
+            .map((seat, index) => (
+              <div
+                key={seat}
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #ddd",
+                }}
+              >
+                {index === 0 && "🥇 "}
+                {index === 1 && "🥈 "}
+                {index === 2 && "🥉 "}
+
+                <strong>{players[seat]?.name}</strong>
+
+                {" - "}
+
+                {gameData.scores?.[seat] || 0}
+                {" punti"}
+              </div>
+            ))}
+        </div>
+      )
+    }    
       <div
         style={{
           width: "100%",
