@@ -1,4 +1,4 @@
-const TEST_MODE = true;
+const TEST_MODE = false;
 const CARDS_PER_PLAYER = TEST_MODE ? 1 : 13;
 export function createDeck() {
   const suits = ["♠", "♥", "♦", "♣"];
