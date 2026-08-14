@@ -171,8 +171,15 @@ export default function Game() {
           trickResolving: false,
         };
         if (handFinished) {
-          updateData.phase = "roundEnd";
-          updateData.scores = updatedScores;
+        const isLastGame = (gameData.currentGame || 1) >= (gameData.gamesToPlay || 4);
+
+        updateData.scores = updatedScores;
+
+          if (isLastGame) {
+            updateData.phase = "gameEnd";
+          } else {
+            updateData.phase = "roundEnd";
+          }
         }
         await updateDoc(tableRef, updateData);
 
@@ -334,7 +341,59 @@ async function startNextRound() {
     </div>
   )
 }
+{
+  phase === "gameEnd" &&
+    (() => {
+      const ranking = Object.keys(players)
+        .map((seat) => ({
+          seat,
+          name: players[seat]?.name,
+          score: gameData.scores?.[seat] || 0,
+        }))
+        .sort((a, b) => b.score - a.score);
 
+      return (
+        <div
+          style={{
+            background: "white",
+            padding: "20px",
+            borderRadius: "12px",
+            minWidth: isMobile ? "90%" : "600px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+          }}
+        >
+          <h2
+            style={{
+              textAlign: "center",
+              marginBottom: "20px",
+            }}
+          >
+            🏆 Classifica Finale
+          </h2>
+
+          {ranking.map((player, index) => (
+            <div
+              key={player.seat}
+              style={{
+                padding: "12px",
+                marginBottom: "8px",
+                borderRadius: "8px",
+                background: index === 0 ? "#ffd700" : "#f5f5f5",
+                fontWeight: index === 0 ? "bold" : "normal",
+              }}
+            >
+              {index === 0 && "🥇 "}
+              {index === 1 && "🥈 "}
+              {index === 2 && "🥉 "}
+              {player.name}
+              {" - "}
+              {player.score} punti
+            </div>
+          ))}
+        </div>
+      );
+    })
+}
       {phase === "roundEnd" && (
         <div
           style={{
