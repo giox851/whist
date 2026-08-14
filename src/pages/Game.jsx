@@ -288,8 +288,6 @@ async function startNextRound() {
         >
           BRISCOLA
         </div>
-        
-        <br />
         <div>
           <b>Fase:</b> {phase}
         </div>
