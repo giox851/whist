@@ -286,7 +286,7 @@ async function startNextRound() {
             fontWeight: "bold",
           }}
         >
-          BRISCOLA
+          BRISCOLA ***
         </div>
         <div>
           <b>Fase:</b> {phase}
